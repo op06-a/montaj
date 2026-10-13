@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Практикум: Архитектура материнской платы</title>
+<title>Практикум: Архитектура материнской платы и сборка ПК</title>
 <style>
   * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
   body { margin:0; background:#141922; color:#e8eef7; user-select:none; }
@@ -11,17 +11,17 @@
   h2 { font-size: 17px; margin: 0 0 10px; color:#8fd0ff; }
   h3 { font-size: 15px; margin: 14px 0 6px; color:#a8d5ff; }
   .card { background:#222b38; border-radius:12px; padding:16px; margin-bottom:14px; }
-  .row { display:flex; gap:14px; flex-wrap:wrap; }
-  .col { flex:1; min-width:260px; }
-  input[type=text] { width:100%; padding:8px; border-radius:6px; border:1px solid #55637a; background:#141922; color:#fff; }
+  .row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start; }
+  .col { flex:1; min-width:240px; }
+  input[type=text], select { padding:8px; border-radius:6px; border:1px solid #55637a; background:#141922; color:#fff; width:100%; }
   button { background:#3d8bff; color:#fff; border:none; padding:9px 14px; border-radius:8px; cursor:pointer; font-size:14px; }
   button:hover { background:#2f76d8; }
   button.secondary { background:#4a5568; }
+  button.small { background:#4a5568; padding:5px 9px; font-size:12px; }
   button:disabled { opacity:.45; cursor:not-allowed; }
   button.danger { background:#c0392b; }
   button.tabBtn { background:#334156; padding:6px 12px; font-size:13px; }
   button.tabBtn.active { background:#3d8bff; }
-  .timer { font-size:16px; font-weight:600; color:#ffd166; }
   .pill { display:inline-block; background:#334156; padding:4px 10px; border-radius:20px; font-size:13px; margin-right:6px; margin-bottom:6px; }
   .hint { font-size:13px; color:#8899b0; margin-top:6px; }
   .log { font-size:12px; color:#8899b0; max-height:160px; overflow:auto; background:#141922; padding:8px; border-radius:6px; white-space:pre-wrap; }
@@ -32,7 +32,7 @@
          max-width:80%; text-align:center; z-index:1000; transition:.3s; display:none; }
 
   #stageNav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
-  #stageNav .navBtn { background:#334156; color:#cfd8e3; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; border:2px solid transparent; }
+  #stageNav .navBtn { background:#334156; color:#cfd8e3; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:12px; border:2px solid transparent; }
   #stageNav .navBtn.active { background:#3d8bff; color:#fff; border-color:#8fd0ff; }
   #stageNav .navBtn.done { background:#1e5a3a; color:#a8f0c6; }
   #stageNav .navBtn:hover { border-color:#8fd0ff; }
@@ -78,7 +78,7 @@
              color:#55637a; font-size:11px; text-align:center; overflow:hidden; }
   .preview img { max-width:100%; max-height:100%; border-radius:6px; }
 
-  #stage3Canvas { width:100%; max-width:1100px; display:block; margin:0 auto;
+  #stage3Canvas { width:100%; max-width:1000px; display:block; margin:0 auto;
                   background:#0a0f15; border-radius:8px; border:2px solid #55637a; cursor:grab; }
   #stage3Canvas.grabbing { cursor:grabbing; }
   #stage3Tabs { margin-bottom:10px; }
@@ -87,21 +87,45 @@
                   padding:10px 14px; margin-bottom:8px; cursor:grab; font-size:13px;
                   display:flex; align-items:center; gap:10px; }
   .boardVariant:hover { border-color:#8fd0ff; }
-  .boardVariant.done { opacity:.4; cursor:default; }
   .boardVariant .bvPin { width:50px; height:32px; border-radius:4px; display:inline-block; }
 
-  #signalChain { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0; }
-  .signalStep { flex:1; min-width:180px; background:#334156; border:2px solid #55637a;
-                border-radius:10px; padding:12px; cursor:grab; text-align:center;
-                font-size:13px; transition:.15s; }
-  .signalStep:hover { border-color:#8fd0ff; }
-  #signalSlots { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0; }
-  .signalSlot { flex:1; min-width:180px; min-height:70px; border:2px dashed #55637a;
-                border-radius:10px; display:flex; align-items:center; justify-content:center;
-                color:#6b7a92; font-size:12px; text-align:center; padding:6px; }
-  .signalSlot.hover { border-color:#8fd0ff; background:rgba(143,208,255,.1); }
-  .signalSlot.filled { background:#1e8a4c; border-style:solid; border-color:#2ecc71; color:#fff; font-size:12px; }
-  #powerDiagram { background:#0f141c; border:2px solid #55637a; border-radius:10px; padding:16px; margin-top:12px; font-size:13px; }
+  #s3bTabs { margin-bottom:10px; }
+  #s3bTabs button { margin-right:6px; }
+  #s3bCanvas { display:block; background:#0a0f15; border-radius:8px; border:2px solid #55637a; cursor:pointer; max-width:100%; }
+  .cableItem { background:#1a2331; border:2px solid #55637a; border-radius:8px;
+               padding:8px 10px; margin-bottom:8px; cursor:pointer; user-select:none;
+               transition:.15s; }
+  .cableItem:hover { border-color:#8fd0ff; }
+  .cableItem.active { background:#3d8bff; border-color:#8fd0ff; color:#fff; }
+  .cableItem.done { background:#1e5a3a; border-color:#2ecc71; cursor:default; opacity:.65; }
+  .cableItem canvas { display:block; margin-top:6px; }
+  .cableItem .cName { font-size:13px; font-weight:600; }
+  .cableItem .cInfo { font-size:11px; color:#8899b0; margin-top:2px; }
+  #s3bHint { font-size:13px; color:#8899b0; margin-top:6px; min-height:20px; }
+  .errBtn { display:block; width:100%; text-align:left; background:#334156; color:#cfd8e3;
+            padding:8px 10px; border-radius:6px; margin:4px 0; font-size:12px; cursor:pointer; }
+  .errBtn:hover { background:#3d8bff; color:#fff; }
+  .errBtn.found { background:#1e5a3a; color:#c7f5d8; cursor:default; }
+
+  #sigWrap { display:flex; gap:14px; flex-wrap:wrap; }
+  #sigTheory { flex:0 0 380px; background:#1a2331; border-radius:10px; padding:14px; max-height:640px; overflow-y:auto; font-size:13px; line-height:1.55; }
+  #sigTheory h3 { color:#8fd0ff; font-size:14px; margin:12px 0 6px; }
+  #sigTheory .sigStepBlock { padding:8px 10px; border-left:3px solid #334156; margin-bottom:8px; opacity:.4; transition:.3s; }
+  #sigTheory .sigStepBlock.active { opacity:1; border-color:#3d8bff; background:rgba(61,139,255,.08); }
+  #sigTheory .sigStepBlock.done { opacity:1; border-color:#2ecc71; }
+  #sigCanvas { display:block; background:#0a0f15; border-radius:8px; border:2px solid #55637a; cursor:pointer; max-width:100%; }
+  #sigHint { margin-top:8px; font-size:13px; color:#8899b0; min-height:20px; }
+  #sigProgress { margin:8px 0; font-size:13px; }
+  #sigQuestionBox { background:#1a2331; border-radius:8px; padding:12px; margin-top:10px; display:none; }
+  #sigQuestionBox .q { font-size:13px; margin-bottom:8px; }
+  .dragChip { display:inline-block; padding:6px 12px; background:#334156; border:2px solid #55637a;
+              border-radius:8px; cursor:grab; font-size:12px; margin:4px; }
+  .dragChip:hover { border-color:#8fd0ff; }
+  .dragChip.used { opacity:.3; cursor:default; }
+  .dropZone { display:inline-block; min-width:120px; padding:6px 10px; background:#141922;
+              border:2px dashed #55637a; border-radius:8px; margin:4px; font-size:12px; text-align:center; }
+  .dropZone.hover { border-color:#8fd0ff; }
+  .dropZone.filled { background:#1e8a4c; border-style:solid; border-color:#2ecc71; color:#fff; }
 
   #routeDiagram { position:relative; }
   .node { position:absolute; background:#334156; border:2px solid #55637a; border-radius:8px;
@@ -131,10 +155,9 @@
 <div id="tip"></div>
 
 <div id="app">
-
   <div id="start" class="card">
     <h1>Практикум: Архитектура материнской платы и сборка ПК</h1>
-    <p>9 этапов. Время — 90 минут. Максимум — 100 баллов.</p>
+    <p>12 этапов. Максимум — 100 баллов.</p>
     <div class="row">
       <div class="col"><label>ФИО студента<br><input type="text" id="fio"></label></div>
       <div class="col"><label>Группа<br><input type="text" id="group"></label></div>
@@ -145,11 +168,8 @@
   <div id="main" style="display:none">
     <div class="card">
       <div class="row">
-        <div class="col"><span class="pill" id="pillStep">Этап: 1/10</span></div>
-        <div class="col" style="text-align:right">
-          <span class="timer" id="timer">90:00</span>
-          <button id="btnSubmit" class="danger" type="button" style="margin-left:12px">Сдать работу</button>
-        </div>
+        <div class="col"><span class="pill" id="pillStep">Этап: 1/12</span></div>
+        <div class="col" style="text-align:right"><button id="btnSubmit" class="danger" type="button">Сдать работу</button></div>
       </div>
       <div id="stageNav"></div>
       <h2 id="stepTitle">Этап 0. Теоретическая часть</h2>
@@ -157,85 +177,78 @@
 
     <!-- ЭТАП 0 -->
     <div id="stage0" class="card">
-      <h2>Теоретическая часть</h2>
-      <p class="hint">Прочитайте материал. Прокрутите до конца, чтобы открылась кнопка.</p>
+      <h2>Этап 0. Теоретическая часть</h2>
+      <p class="hint">Прокрутите до конца, чтобы открылась кнопка.</p>
       <div id="theoryBody">
         <h3>1. Что такое материнская плата</h3>
-        <p>Материнская плата (motherboard) — основная печатная плата ПК, связывающая все компоненты в единую систему.</p>
+        <p>Материнская плата — основная печатная плата ПК, связывающая все компоненты.</p>
         <ul>
-          <li><b>Сокет CPU</b> — разъём для процессора (AM5, LGA1700 и др.).</li>
-          <li><b>Слоты DIMM</b> — для оперативной памяти (DDR5 на современных платах).</li>
+          <li><b>Сокет CPU</b> — разъём для процессора.</li>
+          <li><b>Слоты DIMM</b> — для оперативной памяти (DDR5).</li>
           <li><b>Чипсет</b> — коммутатор периферии: SATA, USB, часть PCIe, аудио, сеть.</li>
-          <li><b>VRM</b> — модуль стабилизации питания процессора.</li>
-          <li><b>PCIe</b> — для видеокарты (x16) и плат расширения.</li>
-          <li><b>M.2 и SATA</b> — для накопителей.</li>
-          <li><b>Разъёмы питания</b>: 24-pin ATX и 8-pin EPS.</li>
-          <li><b>F_PANEL</b> — колодка для кнопок и индикаторов передней панели.</li>
+          <li><b>VRM</b> — стабилизатор питания процессора.</li>
+          <li><b>PCIe x16</b> — слот для видеокарты.</li>
+          <li><b>M.2, SATA</b> — для накопителей.</li>
+          <li><b>24-pin ATX</b>, <b>8-pin EPS</b> — разъёмы питания.</li>
+          <li><b>F_PANEL</b> — колодка передней панели.</li>
         </ul>
-
         <h3>2. Архитектура</h3>
         <ul>
-          <li><b>Напрямую к CPU</b>: оперативная память и основной PCIe x16 (видеокарта).</li>
-          <li><b>Через чипсет</b>: SATA, USB, часть PCIe, M.2, аудио, сеть.</li>
+          <li><b>Напрямую к CPU</b>: RAM и PCIe x16 (видеокарта).</li>
+          <li><b>Через чипсет</b>: SATA, USB, M.2, аудио, сеть.</li>
         </ul>
-
-        <h3>3. Путь сигнала</h3>
+        <h3>3. Путь сигнала (кратко)</h3>
         <ul>
-          <li><b>Power SW</b> — замыкается контакт на F_PANEL.</li>
-          <li><b>Супервизор/чипсет</b> проверяет напряжения БП, даёт команду PS_ON.</li>
-          <li><b>БП подаёт питание</b> через 24-pin и 8-pin.</li>
-          <li><b>CPU запускает BIOS/UEFI</b>, проходит POST.</li>
-          <li><b>Поиск загрузчика</b> и передача управления ОС.</li>
+          <li>Power SW → чипсет → PS_ON → БП → питание → CPU → BIOS → POST → загрузчик ОС.</li>
         </ul>
-        <p><b>Условие работы:</b> без CPU, RAM, видеокарты, 24-pin, 8-pin и Power SW — POST не пройдёт.</p>
-
-        <h3>4. Типичные ошибки монтажа</h3>
+        <p>Подробно — на этапе 7 «Сигналы».</p>
+        <h3>4. Кабели и разъёмы</h3>
         <ul>
-          <li>Установка платы без стоек — короткое замыкание.</li>
-          <li>Винты по кругу — перекос платы. Правильно — крест-накрест.</li>
-          <li>Нет 8-pin CPU — ПК включается, но нет изображения.</li>
-          <li>Неправильная установка Power SW — кнопка не работает.</li>
-          <li>DDR4 в слоте DDR5 — ключ не совпадает.</li>
+          <li><b>24-pin ATX</b> — основное питание платы.</li>
+          <li><b>8-pin EPS</b> — питание CPU.</li>
+          <li><b>6+2-pin PCIe</b> — питание видеокарты.</li>
+          <li><b>SATA power</b> и <b>SATA data</b> — для HDD/SSD.</li>
+          <li><b>F_PANEL</b> — Power SW, Reset SW, HDD LED, Power LED, Speaker.</li>
+          <li><b>F_USB3</b> (19-pin), <b>F_USB</b> (9-pin), <b>F_AUDIO</b> (9-pin), <b>F_U32C</b>.</li>
+        </ul>
+        <h3>5. Типичные ошибки</h3>
+        <ul>
+          <li>Плата без стоек — КЗ.</li>
+          <li>Винты по кругу — перекос.</li>
+          <li>Нет 8-pin CPU — нет изображения.</li>
+          <li>DDR4 в DDR5 — не подходит.</li>
         </ul>
       </div>
-      <button id="btnTheory" class="secondary" type="button" style="margin-top:12px" disabled>Я прочитал, продолжить</button>
+      <button id="btnTheory" class="secondary" type="button" style="margin-top:12px" disabled>Я прочитал</button>
     </div>
 
     <!-- ЭТАП 1 -->
     <div id="stage1" class="card" style="display:none">
       <h2>Этап 1. Сопоставление компонентов со схемой платы</h2>
-      <p><b>Шаг 1:</b> перетащите название компонента на соответствующую зону.<br>
-         <b>Шаг 2:</b> после правильного попадания откроется вопрос — напишите определение.</p>
+      <p>Перетащите название на зону. Затем напишите определение.</p>
       <div id="viewTabs">
         <button class="tabBtn active" id="tabSvg" type="button">Схема</button>
-        <button class="tabBtn" id="tab3D" type="button" disabled>3D-модель 🔒</button>
+        <button class="tabBtn" id="tab3D" type="button" disabled>3D 🔒</button>
       </div>
-      <p class="hint" id="lockHint">3D-модель откроется, когда вы сопоставите все 9 компонентов.</p>
+      <p class="hint" id="lockHint">3D откроется после сопоставления 9 компонентов.</p>
       <div id="compPool"></div>
       <div id="boardSvgWrap">
         <svg id="boardSvg" viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg">
           <rect x="20" y="20" width="920" height="480" rx="8" fill="#0d2615" stroke="#2ecc71" stroke-width="2"/>
-          <circle cx="60" cy="60" r="6" fill="#0a0e14" stroke="#7be0a3"/>
-          <circle cx="900" cy="60" r="6" fill="#0a0e14" stroke="#7be0a3"/>
-          <circle cx="60" cy="460" r="6" fill="#0a0e14" stroke="#7be0a3"/>
-          <circle cx="900" cy="460" r="6" fill="#0a0e14" stroke="#7be0a3"/>
-          <circle cx="480" cy="60" r="6" fill="#0a0e14" stroke="#7be0a3"/>
-          <circle cx="480" cy="460" r="6" fill="#0a0e14" stroke="#7be0a3"/>
           <g class="compZone" data-comp="socket">
             <rect x="380" y="180" width="200" height="180" rx="6" fill="#1a3a55" stroke="#3d8bff" stroke-width="2"/>
             <text x="480" y="270" text-anchor="middle" fill="#a8d5ff" font-size="14" font-weight="700">CPU SOCKET</text>
-            <text x="480" y="290" text-anchor="middle" fill="#6b9ec7" font-size="11">AM5 / LGA</text>
           </g>
           <g class="compZone" data-comp="vrm">
             <rect x="330" y="60" width="310" height="40" rx="4" fill="#3a1e1e" stroke="#e74c3c" stroke-width="2"/>
-            <text x="485" y="86" text-anchor="middle" fill="#f5c7c7" font-size="13" font-weight="700">VRM + РАДИАТОРЫ</text>
+            <text x="485" y="86" text-anchor="middle" fill="#f5c7c7" font-size="13" font-weight="700">VRM</text>
           </g>
           <g class="compZone" data-comp="ram">
             <rect x="640" y="140" width="20" height="240" rx="3" fill="#1e3a55" stroke="#4dd0e1" stroke-width="2"/>
             <rect x="670" y="140" width="20" height="240" rx="3" fill="#1e3a55" stroke="#4dd0e1" stroke-width="2"/>
             <rect x="700" y="140" width="20" height="240" rx="3" fill="#1e3a55" stroke="#4dd0e1" stroke-width="2"/>
             <rect x="730" y="140" width="20" height="240" rx="3" fill="#1e3a55" stroke="#4dd0e1" stroke-width="2"/>
-            <text x="695" y="130" text-anchor="middle" fill="#a8e5ee" font-size="12" font-weight="700">DDR5 DIMM</text>
+            <text x="695" y="130" text-anchor="middle" fill="#a8e5ee" font-size="12" font-weight="700">DDR5</text>
           </g>
           <g class="compZone" data-comp="pcie">
             <rect x="100" y="380" width="360" height="24" rx="3" fill="#2a2f38" stroke="#f0c040" stroke-width="2"/>
@@ -243,12 +256,11 @@
           </g>
           <g class="compZone" data-comp="m2">
             <rect x="100" y="280" width="200" height="18" rx="3" fill="#1e1e2a" stroke="#9b59b6" stroke-width="2"/>
-            <text x="200" y="293" text-anchor="middle" fill="#e0c7ee" font-size="11">M.2 NVMe</text>
+            <text x="200" y="293" text-anchor="middle" fill="#e0c7ee" font-size="11">M.2</text>
           </g>
           <g class="compZone" data-comp="chipset">
             <rect x="640" y="380" width="180" height="100" rx="6" fill="#1a1e2e" stroke="#3d8bff" stroke-width="2"/>
-            <text x="730" y="425" text-anchor="middle" fill="#a8d5ff" font-size="13" font-weight="700">ЧИПСЕТ</text>
-            <text x="730" y="445" text-anchor="middle" fill="#6b9ec7" font-size="11">X870E</text>
+            <text x="730" y="430" text-anchor="middle" fill="#a8d5ff" font-size="13" font-weight="700">ЧИПСЕТ</text>
           </g>
           <g class="compZone" data-comp="sata">
             <rect x="860" y="380" width="60" height="40" rx="3" fill="#2a2f38" stroke="#f39c12" stroke-width="2"/>
@@ -266,7 +278,6 @@
       </div>
       <div id="board3DWrap" style="display:none;">
         <canvas id="board3D" width="960" height="520"></canvas>
-        <p class="hint">Зажмите мышь и двигайте влево-вправо, чтобы вращать.</p>
       </div>
       <div id="compPanel">
         <h3 id="compTitle">—</h3>
@@ -275,103 +286,140 @@
         <button id="btnAnswer" type="button" style="margin-top:8px">Ответить</button>
         <div class="feedback" id="compFeedback" style="display:none;"></div>
       </div>
-      <p style="font-size:14px;">Сопоставлено: <b id="studiedCount" style="color:#8fd0ff">0</b> / <b id="totalComps">0</b> · Определений: <b id="definedCount" style="color:#8fd0ff">0</b> / <b id="totalComps">0</b></p>
-      <button id="btnStage1" class="secondary" type="button" disabled>Перейти к следующему этапу</button>
+      <p>Сопоставлено: <b id="studiedCount" style="color:#8fd0ff">0</b> / <b id="totalComps">0</b> · Определений: <b id="definedCount" style="color:#8fd0ff">0</b> / <b id="totalComps">0</b></p>
+      <button id="btnStage1" class="secondary" type="button" disabled>Далее</button>
     </div>
 
     <!-- ЭТАП 2 -->
     <div id="stage2" class="card" style="display:none">
       <h2>Этап 2. Совместимость — три материнские платы</h2>
-      <p class="hint">Вам предстоит пройти проверку совместимости для трёх разных плат. Для каждой — 5 утверждений. Отметьте только те, что <b>подходят</b>.</p>
+      <p class="hint">Три платы по 5 утверждений.</p>
       <div id="s2_progress" style="margin-bottom:10px;"></div>
       <div id="s2_currentBoard"></div>
       <div id="compatList"></div>
       <button id="btnStage2" class="secondary" type="button" style="margin-top:10px">Проверить и перейти к следующей</button>
     </div>
 
-    <!-- ЭТАП 3: 3D-монтаж -->
+    <!-- ЭТАП 3: ОПОЗНАНИЕ РАЗЪЁМОВ + ТЕОРИЯ T1-T4 -->
+    <div id="stage3id" class="card" style="display:none">
+      <h2>Этап 3. Опознание разъёмов и теория</h2>
+      <p class="hint">Прочитайте теорию и выполните задания по ходу.</p>
+      <div id="sidTabs"></div>
+      <div id="sidBody"></div>
+    </div>
+
+    <!-- ЭТАП 4: КАБЕЛИ ИЗ МОДУЛЬНОГО БП -->
+    <div id="stage4c" class="card" style="display:none">
+      <h2>Этап 4. Кабели из модульного БП</h2>
+      <div id="s4cBody"></div>
+    </div>
+
+    <!-- ЭТАП 5: МОНТАЖ 3D -->
     <div id="stage3" class="card" style="display:none">
-      <h2>Этап 3. Монтаж платы в корпус (3D)</h2>
+      <h2>Этап 5. Монтаж платы в корпус (3D)</h2>
       <div id="stage3Tabs">
         <button class="tabBtn active" id="s3tab_io" type="button">Шаг 1: I/O shield</button>
         <button class="tabBtn" id="s3tab_stands" type="button" disabled>Шаг 2: Стойки</button>
-        <button class="tabBtn" id="s3tab_board" type="button" disabled>Шаг 3: Укладка платы</button>
+        <button class="tabBtn" id="s3tab_board" type="button" disabled>Шаг 3: Укладка</button>
         <button class="tabBtn" id="s3tab_screws" type="button" disabled>Шаг 4: Винты</button>
       </div>
-      <p class="hint" id="s3_hint">Выберите правильный I/O shield и перетащите его в окно корпуса. Плата — форм-фактор ATX.</p>
+      <p class="hint" id="s3_hint"></p>
       <div class="row">
         <div class="col" style="flex:0 0 240px;" id="s3_left"></div>
-        <div class="col" style="flex:2">
-          <canvas id="stage3Canvas" width="1000" height="560"></canvas>
-        </div>
+        <div class="col" style="flex:2"><canvas id="stage3Canvas" width="1000" height="560"></canvas></div>
       </div>
-      <p>Стоек: <b id="s3_standsCount">0</b> / 9. Винтов: <b id="s3_screwsDone">0</b> / 9. Порядок: <b id="s3_orderStatus">—</b></p>
-      <button id="btnStage3" class="secondary" type="button" disabled>Проверить этап</button>
+      <p>Стоек: <b id="s3_standsCount">0</b>/9. Винтов: <b id="s3_screwsDone">0</b>/9. Порядок: <b id="s3_orderStatus">—</b></p>
+      <button id="btnStage3" class="secondary" type="button" disabled>Проверить</button>
     </div>
 
-    <!-- ЭТАП 4 -->
-    <div id="stage4" class="card" style="display:none">
-      <h2>Этап 4. Маршруты данных на материнской плате</h2>
-      <p>Для каждого маршрута: возьмите карточку слева и <b>кликните по узлам</b> в правильной последовательности. Линии рисуются автоматически.</p>
+    <!-- ЭТАП 6: ПОДКЛЮЧЕНИЕ КАБЕЛЕЙ (drag) -->
+    <div id="stage3b" class="card" style="display:none">
+      <h2>Этап 6. Подключение кабелей (drag-and-drop)</h2>
+      <p class="hint">Тяните кабели мышью на разъёмы. Подходящие подсветятся зелёным.</p>
+      <div id="s3bTabs">
+        <button class="tabBtn active" id="s3bTab1" type="button">1. Питание</button>
+        <button class="tabBtn" id="s3bTab2" type="button">2. F_PANEL</button>
+        <button class="tabBtn" id="s3bTab3" type="button">3. USB и Audio</button>
+        <button class="tabBtn" id="s3bTab4" type="button">4. Поиск ошибок</button>
+      </div>
       <div class="row">
-        <div class="col" style="flex:0 0 280px;">
-          <p><b>Маршруты:</b></p>
-          <div id="routeList"></div>
-        </div>
+        <div class="col" style="flex:0 0 300px;" id="s3bCablePanel"></div>
         <div class="col" style="flex:2">
-          <div id="routeDiagram" style="position:relative; width:100%; height:520px; background:#0f141c;
-                                         border:2px solid #55637a; border-radius:10px; overflow:hidden;">
+          <canvas id="s3bCanvas" width="900" height="620"></canvas>
+          <div id="s3bHint"></div>
+        </div>
+      </div>
+      <p>Подключено: <b id="s3bConnected">0</b> / <b id="s3bTotal">0</b></p>
+      <button id="btnStage3b" class="secondary" type="button" disabled>Проверить</button>
+    </div>
+
+    <!-- ЭТАП 7: СИГНАЛЫ -->
+    <div id="stage4b" class="card" style="display:none">
+      <h2>Этап 7. Сигналы на материнской плате</h2>
+      <p class="hint">Теория слева, интерактив справа. 6 шагов.</p>
+      <div id="sigProgress">Шаг <b id="sigStepNum">1</b> из 6. Баллов: <b id="sigScore">0</b> / 20</div>
+      <div id="sigWrap">
+        <div id="sigTheory"></div>
+        <div style="flex:2; min-width:400px;">
+          <canvas id="sigCanvas" width="700" height="640"></canvas>
+          <div id="sigHint"></div>
+          <div id="sigQuestionBox">
+            <div class="q" id="sigQuestionText"></div>
+            <input type="text" id="sigQuestionAnswer" placeholder="Ваш ответ...">
+            <button id="sigQuestionBtn" type="button" style="margin-top:8px">Ответить</button>
+            <div class="feedback" id="sigQuestionFb" style="display:none;"></div>
+          </div>
+          <div id="sigExtra" style="margin-top:10px;"></div>
+          <button id="sigNextBtn" class="secondary" type="button" style="margin-top:10px" disabled>Следующий шаг</button>
+        </div>
+      </div>
+      <button id="btnStage4b" class="secondary" type="button" style="margin-top:14px" disabled>Проверить</button>
+    </div>
+
+    <!-- ЭТАП 8: МАРШРУТЫ -->
+    <div id="stage4" class="card" style="display:none">
+      <h2>Этап 8. Маршруты данных</h2>
+      <p>Выберите маршрут и кликните по узлам по порядку.</p>
+      <div class="row">
+        <div class="col" style="flex:0 0 280px;"><p><b>Маршруты:</b></p><div id="routeList"></div></div>
+        <div class="col" style="flex:2">
+          <div id="routeDiagram" style="position:relative; width:100%; height:520px; background:#0f141c; border:2px solid #55637a; border-radius:10px; overflow:hidden;">
             <svg id="routeSvg" width="100%" height="100%" style="position:absolute; top:0; left:0; pointer-events:none;"></svg>
           </div>
         </div>
       </div>
-      <p style="margin-top:12px;">Правильных маршрутов: <b id="routesDone">0</b> / 7</p>
-      <button id="btnStage4" class="secondary" type="button" disabled>Проверить этап</button>
+      <p style="margin-top:12px;">Правильных: <b id="routesDone">0</b> / 7</p>
+      <button id="btnStage4" class="secondary" type="button" disabled>Проверить</button>
     </div>
 
-    <!-- ЭТАП 5 -->
-    <div id="stage5" class="card" style="display:none">
-      <h2>Этап 5. Путь сигнала</h2>
-      <p><b>5.1.</b> Перетащите карточки в правильном порядке в слоты 1–6.</p>
-      <div id="signalChain"></div>
-      <div id="signalSlots"></div>
-      <button id="btnCheckOrder" class="secondary" type="button">Проверить порядок</button>
-      <div id="powerDiagram" style="display:none; margin-top:20px;">
-        <h3>5.2. Отметьте только критичные условия для POST</h3>
-        <div id="powerConds"></div>
-        <button id="btnCheckConds" class="secondary" type="button" style="margin-top:10px">Проверить условия</button>
-      </div>
-      <button id="btnStage5" class="secondary" type="button" style="margin-top:14px" disabled>Проверить этап</button>
-    </div>
-
-    <!-- ЭТАП 6 -->
+    <!-- ЭТАП 9: ДИАГНОСТИКА -->
     <div id="stage6" class="card" style="display:none">
-      <h2>Этап 6. Диагностика неисправностей</h2>
-      <div id="diagList"></div>
-      <button id="btnStage6" class="secondary" type="button" style="margin-top:10px">Завершить</button>
+      <h2>Этап 9. Диагностика (16 ситуаций)</h2>
+      <p class="hint">Определите причину по симптому.</p>
+      <div id="diagBody"></div>
+      <button id="btnStage6" class="secondary" type="button" style="margin-top:10px">Проверить</button>
     </div>
 
-    <!-- ЭТАП 7 -->
+    <!-- ЭТАП 10: ПОИСК -->
     <div id="stage7" class="card" style="display:none">
-      <h2>Этап 7. Поиск компонентов, подпись и назначение</h2>
-      <p>Для каждого компонента: <b>найдите в интернете фотографию</b>, загрузите в поле, введите <b>название</b> и <b>назначение</b>.</p>
-      <p class="hint">За компонент: изображение — 1, название — 0,5, назначение — 0,7.</p>
+      <h2>Этап 10. Поиск компонентов, подпись и назначение</h2>
+      <p>Найдите фотографию, загрузите, введите название и назначение.</p>
       <div id="compSearchList"></div>
-      <p style="margin-top:14px;">Обработано: <b id="compSearchDone">0</b> / 9. Баллов: <b id="compSearchScore">0</b> / 20.</p>
-      <button id="btnStage7" class="secondary" type="button" disabled>Перейти к тесту</button>
+      <p>Обработано: <b id="compSearchDone">0</b>/9. Баллов: <b id="compSearchScore">0</b>/6.</p>
+      <button id="btnStage7" class="secondary" type="button" disabled>Далее</button>
     </div>
 
-    <!-- ЭТАП 8 -->
+    <!-- ЭТАП 11: ТЕСТ -->
     <div id="stage8" class="card" style="display:none">
-      <h2>Этап 8. Итоговый тест</h2>
-      <p>20 вопросов. Каждый — 0,5 балла.</p>
+      <h2>Этап 11. Итоговый тест</h2>
+      <p>20 вопросов. Каждый — 0,3 балла.</p>
       <div id="testList"></div>
-      <button id="btnStage8" class="secondary" type="button" style="margin-top:10px">Завершить тест</button>
+      <button id="btnStage8" class="secondary" type="button" style="margin-top:10px">Завершить</button>
     </div>
 
     <!-- РЕЗУЛЬТАТ -->
     <div id="result" class="card" style="display:none">
-      <h2>Результат практикума</h2>
+      <h2>Результат</h2>
       <div id="grade">—</div>
       <p id="summary"></p>
       <table id="scoreTable">
@@ -380,1560 +428,1745 @@
       </table>
       <h3>Загруженные изображения</h3>
       <div id="resultImages" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;"></div>
-      <p class="hint">Журнал действий:</p>
+      <p class="hint">Журнал:</p>
       <div id="log" class="log"></div>
-      <button id="btnPrint" type="button" style="margin-top:12px">Печать / скрин</button>
+      <button id="btnPrint" type="button" style="margin-top:12px">Печать</button>
     </div>
   </div>
-
 </div>
 <script>
 (function(){
   "use strict";
-
   function $(id){ return document.getElementById(id); }
-  function showError(msg){
-    var bar = $("errBar");
-    bar.style.display = "block";
-    bar.textContent = "ОШИБКА: " + msg;
-    console.error(msg);
-  }
+  function showError(msg){ var b=$("errBar"); b.style.display="block"; b.textContent="ОШИБКА: "+msg; console.error(msg); }
   window.addEventListener("error", function(e){ showError(e.message); });
-
   var tipTimer = null;
-  function showTip(msg, ms){
-    var t = $("tip");
-    t.textContent = msg;
-    t.style.display = "block";
-    t.style.opacity = "1";
-    if (tipTimer) clearTimeout(tipTimer);
-    if (ms) tipTimer = setTimeout(function(){ t.style.opacity = "0"; }, ms);
-  }
+  function showTip(msg, ms){ var t=$("tip"); t.textContent=msg; t.style.display="block"; t.style.opacity="1"; if(tipTimer) clearTimeout(tipTimer); if(ms) tipTimer=setTimeout(function(){t.style.opacity="0";},ms); }
 
   var S = {
-    fio:"", group:"", startTime:0, totalTime:90*60,
-    currentStage:0,
-    theory: { done:false },
-    stage1: { paired:0, defined:0, score:0, status:"не сдано" },
-    stage2: { score:0, status:"не сдано", boardIdx:0, correctTotal:0 },
-    stage3: { score:0, status:"не сдано" },
-    stage4: { score:0, status:"не сдано" },
-    stage5: { score:0, status:"не сдано", orderScore:null, condScore:null },
-    stage6: { score:0, status:"не сдано" },
-    stage7: { score:0, status:"не сдано", cards:{} },
-    stage8: { score:0, status:"не сдано" },
+    fio:"", group:"", currentStage:0,
+    theory:{done:false},
+    stage1:{paired:0,defined:0,score:0,status:"не сдано"},
+    stage2:{score:0,status:"не сдано",boardIdx:0,correctTotal:0,shown:false},
+    stage3id:{score:0,status:"не сдано",inited:false},
+    stage4c:{score:0,status:"не сдано",inited:false},
+    stage3:{score:0,status:"не сдано"},
+    stage3b:{score:0,status:"не сдано",inited:false},
+    stage4b:{score:0,status:"не сдано",inited:false},
+    stage4:{score:0,status:"не сдано"},
+    stage6:{score:0,status:"не сдано"},
+    stage7:{score:0,status:"не сдано",cards:{}},
+    stage8:{score:0,status:"не сдано"},
     log:[]
   };
-
-  function log(msg){ S.log.push("[" + new Date().toLocaleTimeString() + "] " + msg); }
+  function log(msg){ S.log.push("["+new Date().toLocaleTimeString()+"] "+msg); }
   function renderLog(){ $("log").textContent = S.log.join("\n"); }
 
-  /* ---------- СТАРТ ---------- */
   $("btnStart").addEventListener("click", function(){
-    try {
-      var fio = $("fio").value.trim();
-      var grp = $("group").value.trim();
-      if (fio.length < 5 || grp.length < 2){ alert("Введите ФИО (от 5 символов) и группу."); return; }
-      S.fio = fio; S.group = grp;
-      S.startTime = Date.now();
-      log("Старт. " + fio + ", гр. " + grp);
-      $("start").style.display = "none";
-      $("main").style.display = "block";
-      buildStageNav();
-      initTheory();
-      initStage1();
-      initStage6();
-      initStage7();
-      initStage8();
+    try{
+      var fio=$("fio").value.trim(), grp=$("group").value.trim();
+      if(fio.length<5||grp.length<2){ alert("Введите ФИО (от 5 символов) и группу."); return; }
+      S.fio=fio; S.group=grp;
+      log("Старт. "+fio+", гр. "+grp);
+      $("start").style.display="none"; $("main").style.display="block";
+      buildStageNav(); initTheory(); initStage1();
       goToStage(0);
-      startTimer();
-    } catch(err){ showError(err.message); }
+    }catch(e){ showError(e.message); }
   });
 
-  function startTimer(){
-    var t = setInterval(function(){
-      var left = S.totalTime - Math.floor((Date.now()-S.startTime)/1000);
-      if (left <= 0){ clearInterval(t); finish(true); return; }
-      var m = String(Math.floor(left/60)); if (m.length<2) m = "0"+m;
-      var s = String(left%60); if (s.length<2) s = "0"+s;
-      $("timer").textContent = m + ":" + s;
-    }, 500);
-  }
-
-  /* ---------- НАВИГАЦИЯ ---------- */
-  var STAGE_NAMES = [
-    "0. Теория","1. Сопоставление","2. Совместимость","3. Монтаж 3D",
-    "4. Маршруты","5. Сигнал","6. Диагностика","7. Поиск и описание","8. Тест"
+  var STAGE_NAMES=[
+    "0. Теория","1. Сопоставление","2. Совместимость","3. Разъёмы",
+    "4. Кабели БП","5. Монтаж 3D","6. Подключение","7. Сигналы",
+    "8. Маршруты","9. Диагностика","10. Поиск","11. Тест"
   ];
-
   function buildStageNav(){
-    var nav = $("stageNav");
-    nav.innerHTML = "";
-    for (var i=0;i<STAGE_NAMES.length;i++){
+    var nav=$("stageNav"); nav.innerHTML="";
+    for(var i=0;i<STAGE_NAMES.length;i++){
       (function(idx){
-        var b = document.createElement("div");
-        b.className = "navBtn";
-        b.textContent = STAGE_NAMES[idx];
-        b.addEventListener("click", function(){
-          if (idx === 0 && !S.theory.done){ showTip("Прочитайте теорию до конца", 1500); return; }
+        var b=document.createElement("div"); b.className="navBtn"; b.textContent=STAGE_NAMES[idx];
+        b.addEventListener("click",function(){
+          if(idx===0&&!S.theory.done){showTip("Прочитайте теорию до конца",1500);return;}
           goToStage(idx);
         });
         nav.appendChild(b);
       })(i);
     }
   }
-
   function refreshStageNav(){
-    var btns = $("stageNav").querySelectorAll(".navBtn");
-    for (var i=0;i<btns.length;i++){
-      btns[i].className = "navBtn";
-      if (i === S.currentStage) btns[i].className += " active";
-      if (i === 0 && S.theory.done) btns[i].className += " done";
-      var keys = ["","stage1","stage2","stage3","stage4","stage5","stage6","stage7","stage8"];
-      if (i >= 1 && i <= 8 && S[keys[i]] && S[keys[i]].status === "сдано") btns[i].className += " done";
+    var btns=$("stageNav").querySelectorAll(".navBtn");
+    var keys=["","stage1","stage2","stage3id","stage4c","stage3","stage3b","stage4b","stage4","stage6","stage7","stage8"];
+    for(var i=0;i<btns.length;i++){
+      btns[i].className="navBtn";
+      if(i===S.currentStage) btns[i].className+=" active";
+      if(i===0&&S.theory.done) btns[i].className+=" done";
+      if(i>=1&&i<=11&&S[keys[i]]&&S[keys[i]].status==="сдано") btns[i].className+=" done";
     }
   }
-
   function goToStage(n){
-    var all = ["stage0","stage1","stage2","stage3","stage4","stage5","stage6","stage7","stage8","result"];
-    for (var i=0;i<all.length;i++) $(all[i]).style.display = "none";
-    S.currentStage = n;
-    $(all[n]).style.display = "block";
-    $("pillStep").textContent = "Этап: " + (n+1) + "/10";
-    var titles = [
+    var all=["stage0","stage1","stage2","stage3id","stage4c","stage3","stage3b","stage4b","stage4","stage6","stage7","stage8","result"];
+    for(var i=0;i<all.length;i++) $(all[i]).style.display="none";
+    S.currentStage=n;
+    var ids=["stage0","stage1","stage2","stage3id","stage4c","stage3","stage3b","stage4b","stage4","stage6","stage7","stage8","result"];
+    $(ids[n]).style.display="block";
+    $("pillStep").textContent="Этап: "+(n+1)+"/12";
+    var titles=[
       "Этап 0. Теоретическая часть",
-      "Этап 1. Сопоставление компонентов со схемой платы",
-      "Этап 2. Совместимость — три материнские платы",
-      "Этап 3. Монтаж платы в корпус (3D)",
-      "Этап 4. Маршруты данных на материнской плате",
-      "Этап 5. Путь сигнала: от кнопки Power до загрузки ОС",
-      "Этап 6. Диагностика неисправностей",
-      "Этап 7. Поиск компонентов, подпись и назначение",
-      "Этап 8. Итоговый тест",
+      "Этап 1. Сопоставление компонентов",
+      "Этап 2. Совместимость — три платы",
+      "Этап 3. Опознание разъёмов + теория",
+      "Этап 4. Кабели из модульного БП",
+      "Этап 5. Монтаж платы в корпус (3D)",
+      "Этап 6. Подключение кабелей (drag-and-drop)",
+      "Этап 7. Сигналы на материнской плате",
+      "Этап 8. Маршруты данных",
+      "Этап 9. Диагностика (16 ситуаций)",
+      "Этап 10. Поиск компонентов",
+      "Этап 11. Итоговый тест",
       "Результат"
     ];
-    $("stepTitle").textContent = titles[n];
-    if (n === 2) initStage2_showBoard(0);
-    if (n === 3 && !S.stage3.inited) { S.stage3.inited = true; initStage3(); }
-    if (n === 4 && !S.stage4.inited) { S.stage4.inited = true; initStage4(); }
-    if (n === 5 && !S.stage5.inited) { S.stage5.inited = true; initStage5(); }
+    $("stepTitle").textContent=titles[n];
+    if(n===2&&!S.stage2.shown){ S.stage2.shown=true; initStage2_showBoard(0); }
+    if(n===3&&!S.stage3id.inited){ S.stage3id.inited=true; initStage3id(); }
+    if(n===4&&!S.stage4c.inited){ S.stage4c.inited=true; initStage4c(); }
+    if(n===5&&!S.stage3.inited){ S.stage3.inited=true; initStage3(); }
+    if(n===6&&!S.stage3b.inited){ S.stage3b.inited=true; initStage3b(); }
+    if(n===7&&!S.stage4b.inited){ S.stage4b.inited=true; initStage4b(); }
+    if(n===8&&!S.stage4.inited){ S.stage4.inited=true; initStage4(); }
+    if(n===9&&!S.stage6.inited){ S.stage6.inited=true; initStage6(); }
+    if(n===10&&!S.stage7.inited){ S.stage7.inited=true; initStage7(); }
+    if(n===11&&!S.stage8.inited){ S.stage8.inited=true; initStage8(); }
     refreshStageNav();
   }
 
-  /* ============================================================
-     ЭТАП 0: ТЕОРИЯ
-     ============================================================ */
+  /* ============ ЭТАП 0 ============ */
   function initTheory(){
-    var body = $("theoryBody");
-    body.addEventListener("scroll", function(){
-      if (body.scrollTop + body.clientHeight >= body.scrollHeight - 30){
-        $("btnTheory").disabled = false;
-      }
+    var body=$("theoryBody");
+    body.addEventListener("scroll",function(){
+      if(body.scrollTop+body.clientHeight>=body.scrollHeight-30) $("btnTheory").disabled=false;
     });
   }
-  $("btnTheory").addEventListener("click", function(){
-    S.theory.done = true;
-    log("Этап 0: теория прочитана");
-    refreshStageNav();
-    goToStage(1);
+  $("btnTheory").addEventListener("click",function(){
+    S.theory.done=true; log("Этап 0: прочитано"); refreshStageNav(); goToStage(1);
   });
 
-  /* ============================================================
-     ЭТАП 1: СОПОСТАВЛЕНИЕ + 3D
-     ============================================================ */
-  var COMPONENTS = {
-    socket: { name:"Сокет CPU", q:"Что такое сокет и что в него устанавливается?",
-      keys:["процессор","проц","cpu","цп","центральн","камень"],
-      full:"Сокет — разъём для установки процессора." },
-    vrm:    { name:"VRM", q:"Что такое VRM и зачем нужны радиаторы на нём?",
-      keys:["питани","питан","напряж","стабилиз","преобразовател"],
-      full:"VRM — модуль стабилизации питания процессора." },
-    ram:    { name:"Слоты RAM", q:"Что устанавливается в эти слоты?",
-      keys:["оператив","озу","памят","ram","ddr"],
-      full:"Слоты DIMM для оперативной памяти (ОЗУ, DDR5)." },
-    pcie:   { name:"PCIe x16", q:"Какое устройство обычно устанавливается в этот слот?",
-      keys:["видеокарт","видео","gpu","графическ","видеоадаптер"],
-      full:"PCIe x16 — слот для видеокарты (GPU)." },
-    m2:     { name:"M.2", q:"Что устанавливается в этот слот?",
-      keys:["ssd","накопит","nvme","твердотел","ссд"],
-      full:"M.2 — слот для SSD NVMe." },
-    chipset:{ name:"Чипсет", q:"Что такое чипсет и за что он отвечает?",
-      keys:["чипсет","чип","контроллер","перифер","chipset","хаб","мост"],
-      full:"Чипсет — коммутатор периферии: SATA, USB, часть PCIe." },
-    sata:   { name:"SATA", q:"Какие устройства подключаются к SATA?",
-      keys:["накопит","hdd","ssd","диск","жёстк","жестк","ссд","винчестер"],
-      full:"К SATA подключаются накопители: HDD, SSD." },
-    power24:{ name:"24-pin ATX", q:"Что подаётся через этот разъём?",
-      keys:["питани","питан","напряж","энерг","ток"],
-      full:"24-pin ATX — основное питание платы." },
-    power8: { name:"8-pin CPU", q:"Что питает этот разъём?",
-      keys:["процессор","проц","cpu","цп","центральн","камень"],
-      full:"8-pin EPS — питание процессора." }
+  /* ============ ЭТАП 1 ============ */
+  var COMPONENTS={
+    socket:{name:"Сокет CPU",q:"Что такое сокет?",keys:["процессор","проц","cpu","цп","камень"],full:"Сокет — разъём для установки процессора."},
+    vrm:{name:"VRM",q:"Что такое VRM?",keys:["питани","напряж","стабилиз","преобразовател"],full:"VRM — модуль стабилизации питания процессора."},
+    ram:{name:"Слоты RAM",q:"Что вставляется в эти слоты?",keys:["оператив","озу","памят","ram","ddr"],full:"Слоты DIMM для оперативной памяти."},
+    pcie:{name:"PCIe x16",q:"Что в этот слот?",keys:["видеокарт","видео","gpu"],full:"PCIe x16 — слот для видеокарты."},
+    m2:{name:"M.2",q:"Что в этот слот?",keys:["ssd","накопит","nvme","ссд"],full:"M.2 — слот для SSD NVMe."},
+    chipset:{name:"Чипсет",q:"Что такое чипсет?",keys:["перифер","контроллер","чипсет","хаб"],full:"Чипсет — коммутатор периферии."},
+    sata:{name:"SATA",q:"Что к SATA?",keys:["накопит","hdd","ssd","диск"],full:"SATA — интерфейс для HDD/SSD."},
+    power24:{name:"24-pin ATX",q:"Что подаётся?",keys:["питани","напряж","энерг"],full:"24-pin ATX — основное питание платы."},
+    power8:{name:"8-pin CPU",q:"Что питает?",keys:["процессор","проц","cpu","цп"],full:"8-pin EPS — питание процессора."}
   };
-  var TOTAL_COMPS = Object.keys(COMPONENTS).length;
-  var poolItems = [];
+  var TOTAL_COMPS=Object.keys(COMPONENTS).length;
+  var poolItems=[];
 
   function initStage1(){
-    $("totalComps").textContent = TOTAL_COMPS;
-    var names = [];
-    for (var k in COMPONENTS) if (COMPONENTS.hasOwnProperty(k)) names.push(k);
-    names.sort(function(){ return Math.random()-0.5; });
-    var pool = $("compPool");
-    pool.innerHTML = "";
-    poolItems = [];
-    for (var i=0;i<names.length;i++){
+    $("totalComps").textContent=TOTAL_COMPS;
+    var names=[]; for(var k in COMPONENTS) if(COMPONENTS.hasOwnProperty(k)) names.push(k);
+    names.sort(function(){return Math.random()-0.5;});
+    var pool=$("compPool"); pool.innerHTML=""; poolItems=[];
+    for(var i=0;i<names.length;i++){
       (function(key){
-        var el = document.createElement("div");
-        el.className = "poolItem";
-        el.textContent = COMPONENTS[key].name;
+        var el=document.createElement("div"); el.className="poolItem"; el.textContent=COMPONENTS[key].name;
         el.setAttribute("draggable","true");
-        el.addEventListener("dragstart", function(e){
-          if (el.className.indexOf("used") !== -1){ e.preventDefault(); return; }
-          e.dataTransfer.setData("text/plain", key);
-          el.className = "poolItem dragging";
+        el.addEventListener("dragstart",function(e){
+          if(el.className.indexOf("used")!==-1){e.preventDefault();return;}
+          e.dataTransfer.setData("text/plain",key); el.className="poolItem dragging";
         });
-        el.addEventListener("dragend", function(){
-          el.className = "poolItem" + (el.className.indexOf("used")!==-1 ? " used" : "");
-        });
-        pool.appendChild(el);
-        poolItems.push({key:key, el:el});
+        el.addEventListener("dragend",function(){ el.className="poolItem"+(el.className.indexOf("used")!==-1?" used":""); });
+        pool.appendChild(el); poolItems.push({key:key,el:el});
       })(names[i]);
     }
-    var zones = document.querySelectorAll(".compZone");
-    for (var z=0;z<zones.length;z++){
+    var zones=document.querySelectorAll(".compZone");
+    for(var z=0;z<zones.length;z++){
       (function(zone){
-        var key = zone.getAttribute("data-comp");
-        zone.addEventListener("dragover", function(e){ e.preventDefault(); zone.classList.add("hint"); });
-        zone.addEventListener("dragleave", function(){ zone.classList.remove("hint"); });
-        zone.addEventListener("drop", function(e){
-          e.preventDefault();
-          zone.classList.remove("hint");
-          var dropKey = e.dataTransfer.getData("text/plain");
-          if (dropKey === key){
+        var key=zone.getAttribute("data-comp");
+        zone.addEventListener("dragover",function(e){e.preventDefault();zone.classList.add("hint");});
+        zone.addEventListener("dragleave",function(){zone.classList.remove("hint");});
+        zone.addEventListener("drop",function(e){
+          e.preventDefault(); zone.classList.remove("hint");
+          var dropKey=e.dataTransfer.getData("text/plain");
+          if(dropKey===key){
             zone.classList.add("done");
-            for (var p=0;p<poolItems.length;p++){
-              if (poolItems[p].key === key) poolItems[p].el.className = "poolItem used";
-            }
-            S.stage1.paired++;
-            $("studiedCount").textContent = S.stage1.paired;
-            log("Этап 1: сопоставлен " + COMPONENTS[key].name);
+            for(var p=0;p<poolItems.length;p++) if(poolItems[p].key===key) poolItems[p].el.className="poolItem used";
+            S.stage1.paired++; $("studiedCount").textContent=S.stage1.paired;
+            log("Этап 1: "+COMPONENTS[key].name);
             openComponentQuestion(key);
-          } else {
-            showTip("✗ Не тот компонент для этой зоны", 1500);
-          }
+          } else showTip("✗ Не тот компонент",1500);
         });
       })(zones[z]);
     }
     init3D();
   }
 
-  var currentCompKey = null;
+  var currentCompKey=null;
   function openComponentQuestion(key){
-    currentCompKey = key;
-    $("compPanel").style.display = "block";
-    $("compTitle").textContent = COMPONENTS[key].name;
-    $("compQuestion").textContent = COMPONENTS[key].q;
-    $("compAnswer").value = "";
-    $("compFeedback").style.display = "none";
-    $("compAnswer").focus();
+    currentCompKey=key;
+    $("compPanel").style.display="block";
+    $("compTitle").textContent=COMPONENTS[key].name;
+    $("compQuestion").textContent=COMPONENTS[key].q;
+    $("compAnswer").value=""; $("compFeedback").style.display="none"; $("compAnswer").focus();
   }
-
-  $("btnAnswer").addEventListener("click", function(){
-    if (!currentCompKey) return;
-    var comp = COMPONENTS[currentCompKey];
-    var ans = $("compAnswer").value.toLowerCase();
-    var matched = 0;
-    for (var i=0;i<comp.keys.length;i++){
-      if (ans.indexOf(comp.keys[i]) !== -1) matched++;
-    }
-    var fb = $("compFeedback");
-    fb.style.display = "block";
-    if (matched >= 1 && ans.length >= 4){
-      fb.className = "feedback ok";
-      fb.textContent = "✓ Верно.\n\nПравильный ответ: " + comp.full;
-      S.stage1.defined++;
-    } else if (ans.length >= 3){
-      fb.className = "feedback part";
-      fb.textContent = "△ Частично верно.\n\nПравильный ответ: " + comp.full;
-      S.stage1.defined += 0.5;
-    } else {
-      fb.className = "feedback bad";
-      fb.textContent = "✗ Неверно.\n\nПравильный ответ: " + comp.full;
-    }
-    $("definedCount").textContent = S.stage1.defined;
-    $("btnStage1").disabled = (S.stage1.paired < TOTAL_COMPS);
-    currentCompKey = null;
-    if (S.stage1.paired === TOTAL_COMPS) unlock3D();
+  $("btnAnswer").addEventListener("click",function(){
+    if(!currentCompKey) return;
+    var comp=COMPONENTS[currentCompKey];
+    var ans=$("compAnswer").value.toLowerCase();
+    var matched=0;
+    for(var i=0;i<comp.keys.length;i++) if(ans.indexOf(comp.keys[i])!==-1) matched++;
+    var fb=$("compFeedback"); fb.style.display="block";
+    if(matched>=1&&ans.length>=4){ fb.className="feedback ok"; fb.textContent="✓ Верно.\n"+comp.full; S.stage1.defined++; }
+    else if(ans.length>=3){ fb.className="feedback part"; fb.textContent="△ Частично.\n"+comp.full; S.stage1.defined+=0.5; }
+    else { fb.className="feedback bad"; fb.textContent="✗ Неверно.\n"+comp.full; }
+    $("definedCount").textContent=S.stage1.defined;
+    $("btnStage1").disabled=(S.stage1.paired<TOTAL_COMPS);
+    currentCompKey=null;
+    if(S.stage1.paired===TOTAL_COMPS) unlock3D();
+  });
+  $("btnStage1").addEventListener("click",function(){
+    if(S.stage1.paired===TOTAL_COMPS) unlock3D();
+    var pairScore=Math.round(S.stage1.paired/TOTAL_COMPS*4);
+    var defScore=Math.round(S.stage1.defined/TOTAL_COMPS*2);
+    S.stage1.score=Math.min(6,pairScore+defScore); S.stage1.status="сдано";
+    log("Этап 1: "+S.stage1.score+"/6"); showTip("Этап 1: "+S.stage1.score+"/6",2000);
+    refreshStageNav(); goToStage(2);
   });
 
-  $("btnStage1").addEventListener("click", function(){
-    if (S.stage1.paired === TOTAL_COMPS) unlock3D();
-    var pairScore = Math.round(S.stage1.paired / TOTAL_COMPS * 5);
-    var defScore  = Math.round(S.stage1.defined / TOTAL_COMPS * 3);
-    S.stage1.score = pairScore + defScore;
-    S.stage1.status = "сдано";
-    log("Этап 1: балл " + S.stage1.score + "/8");
-    showTip("Этап 1: " + S.stage1.score + "/8", 2000);
-    refreshStageNav();
-    goToStage(2);
-  });
-
-  /* ---------- 3D ---------- */
-  var threeDUnlocked = false;
-  var threeD = { canvas:null, ctx:null, angle:-0.4, dragging:false, lastX:0, components:[], hover:null, selected:null };
-
+  var threeDUnlocked=false;
+  var threeD={canvas:null,ctx:null,angle:-0.4,dragging:false,lastX:0,components:[],hover:null,selected:null};
   function unlock3D(){
-    if (threeDUnlocked) return;
-    threeDUnlocked = true;
-    $("tab3D").disabled = false;
-    $("tab3D").textContent = "3D-модель";
-    $("lockHint").textContent = "🔓 3D-модель открыта. Нажмите на вкладку, чтобы посмотреть.";
-    $("lockHint").style.color = "#2ecc71";
-    showTip("🔓 3D-модель разблокирована!", 3000);
-    log("3D разблокирована");
+    if(threeDUnlocked) return;
+    threeDUnlocked=true; $("tab3D").disabled=false; $("tab3D").textContent="3D";
+    $("lockHint").textContent="🔓 3D открыта."; $("lockHint").style.color="#2ecc71";
+    showTip("🔓 3D разблокирована!",3000);
   }
-
   function init3D(){
-    threeD.canvas = $("board3D");
-    threeD.ctx = threeD.canvas.getContext("2d");
-    threeD.components = [
-      { key:"socket",  name:"Сокет CPU",  x:0,    y:0,    w:200, h:200, z:18, color:"#1a3a55", stroke:"#3d8bff" },
-      { key:"vrm",     name:"VRM",        x:0,    y:-150, w:280, h:40,  z:22, color:"#3a1e1e", stroke:"#e74c3c" },
-      { key:"ram",     name:"RAM DDR5",   x:200,  y:0,    w:80,  h:260, z:40, color:"#1e3a55", stroke:"#4dd0e1" },
-      { key:"chipset", name:"Чипсет",     x:200,  y:180,  w:140, h:140, z:14, color:"#1a1e2e", stroke:"#3d8bff" },
-      { key:"pcie",    name:"PCIe x16",   x:-180, y:180,  w:340, h:30,  z:10, color:"#2a2f38", stroke:"#f0c040" },
-      { key:"m2",      name:"M.2 NVMe",   x:-200, y:60,   w:200, h:20,  z:6,  color:"#1e1e2a", stroke:"#9b59b6" },
-      { key:"sata",    name:"SATA",       x:280,  y:220,  w:60,  h:50,  z:14, color:"#2a2f38", stroke:"#f39c12" },
-      { key:"power24", name:"24-pin ATX", x:280,  y:-180, w:60,  h:50,  z:14, color:"#2a2f38", stroke:"#f0c040" },
-      { key:"power8",  name:"8-pin CPU",  x:280,  y:-110, w:50,  h:40,  z:14, color:"#2a2f38", stroke:"#e74c3c" }
+    threeD.canvas=$("board3D"); threeD.ctx=threeD.canvas.getContext("2d");
+    threeD.components=[
+      {key:"socket",name:"Сокет",x:0,y:0,w:200,h:200,z:18,color:"#1a3a55",stroke:"#3d8bff"},
+      {key:"vrm",name:"VRM",x:0,y:-150,w:280,h:40,z:22,color:"#3a1e1e",stroke:"#e74c3c"},
+      {key:"ram",name:"RAM",x:200,y:0,w:80,h:260,z:40,color:"#1e3a55",stroke:"#4dd0e1"},
+      {key:"chipset",name:"Чипсет",x:200,y:180,w:140,h:140,z:14,color:"#1a1e2e",stroke:"#3d8bff"},
+      {key:"pcie",name:"PCIe",x:-180,y:180,w:340,h:30,z:10,color:"#2a2f38",stroke:"#f0c040"},
+      {key:"m2",name:"M.2",x:-200,y:60,w:200,h:20,z:6,color:"#1e1e2a",stroke:"#9b59b6"},
+      {key:"sata",name:"SATA",x:280,y:220,w:60,h:50,z:14,color:"#2a2f38",stroke:"#f39c12"},
+      {key:"power24",name:"24-pin",x:280,y:-180,w:60,h:50,z:14,color:"#2a2f38",stroke:"#f0c040"},
+      {key:"power8",name:"8-pin",x:280,y:-110,w:50,h:40,z:14,color:"#2a2f38",stroke:"#e74c3c"}
     ];
-    threeD.canvas.addEventListener("mousedown", function(e){ threeD.dragging = true; threeD.lastX = e.clientX; threeD.canvas.className = "grabbing"; });
-    window.addEventListener("mousemove", function(e){
-      if (!threeD.dragging) return;
-      threeD.angle += (e.clientX - threeD.lastX) * 0.01;
-      threeD.lastX = e.clientX;
-      draw3D();
+    threeD.canvas.addEventListener("mousedown",function(e){threeD.dragging=true;threeD.lastX=e.clientX;threeD.canvas.className="grabbing";});
+    window.addEventListener("mousemove",function(e){
+      if(!threeD.dragging) return;
+      threeD.angle+=(e.clientX-threeD.lastX)*0.01; threeD.lastX=e.clientX; draw3D();
     });
-    window.addEventListener("mouseup", function(){ if (threeD.dragging){ threeD.dragging = false; threeD.canvas.className = ""; } });
-    threeD.canvas.addEventListener("mousemove", function(e){
-      var hit = hitTest3D(e);
-      threeD.hover = hit ? hit.key : null;
-      threeD.canvas.style.cursor = hit ? "pointer" : (threeD.dragging ? "grabbing" : "grab");
-      draw3D();
+    window.addEventListener("mouseup",function(){ if(threeD.dragging){threeD.dragging=false;threeD.canvas.className="";} });
+    threeD.canvas.addEventListener("mousemove",function(e){
+      var hit=hitTest3D(e); threeD.hover=hit?hit.key:null;
+      threeD.canvas.style.cursor=hit?"pointer":(threeD.dragging?"grabbing":"grab"); draw3D();
     });
-    threeD.canvas.addEventListener("click", function(e){
-      var hit = hitTest3D(e);
-      if (hit){ threeD.selected = hit.key; showTip(hit.name + " — " + (COMPONENTS[hit.key] ? COMPONENTS[hit.key].full : ""), 4000); }
+    threeD.canvas.addEventListener("click",function(e){
+      var hit=hitTest3D(e);
+      if(hit){ threeD.selected=hit.key; showTip(hit.name+" — "+(COMPONENTS[hit.key]?COMPONENTS[hit.key].full:""),4000); }
     });
     draw3D();
   }
-
   function draw3D(){
-    var ctx = threeD.ctx, W = threeD.canvas.width, H = threeD.canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#0a0f15"; ctx.fillRect(0,0,W,H);
-    var cx = W/2, cy = H/2;
-    var cosA = Math.cos(threeD.angle), sinA = Math.sin(threeD.angle);
-    function project(x, y, z){
-      var xr = x * cosA - y * sinA, yr = x * sinA + y * cosA;
-      return { x: cx + xr + yr * 0.35, y: cy + yr * 0.65 - z };
-    }
-    var corners = [{x:-450,y:-300,z:0},{x:450,y:-300,z:0},{x:450,y:300,z:0},{x:-450,y:300,z:0}];
+    var ctx=threeD.ctx,W=threeD.canvas.width,H=threeD.canvas.height;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0a0f15"; ctx.fillRect(0,0,W,H);
+    var cx=W/2,cy=H/2,cosA=Math.cos(threeD.angle),sinA=Math.sin(threeD.angle);
+    function project(x,y,z){var xr=x*cosA-y*sinA,yr=x*sinA+y*cosA;return{x:cx+xr+yr*0.35,y:cy+yr*0.65-z};}
+    var corners=[{x:-450,y:-300,z:0},{x:450,y:-300,z:0},{x:450,y:300,z:0},{x:-450,y:300,z:0}];
     ctx.beginPath();
-    for (var i=0;i<4;i++){ var p = project(corners[i].x, corners[i].y, corners[i].z); if (i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); }
-    ctx.closePath();
-    ctx.fillStyle = "#0d2615"; ctx.fill();
-    ctx.strokeStyle = "#2ecc71"; ctx.lineWidth = 2; ctx.stroke();
-    ctx.strokeStyle = "rgba(46,204,113,0.15)"; ctx.lineWidth = 1;
-    for (var gx=-400; gx<=400; gx+=50){ var p1 = project(gx,-300,1), p2 = project(gx,300,1); ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); }
-    for (var gy=-250; gy<=250; gy+=50){ var p3 = project(-450,gy,1), p4 = project(450,gy,1); ctx.beginPath(); ctx.moveTo(p3.x,p3.y); ctx.lineTo(p4.x,p4.y); ctx.stroke(); }
-    var list = threeD.components.slice();
-    list.sort(function(a,b){ return (a.x*sinA + a.y*cosA) - (b.x*sinA + b.y*cosA); });
-    for (var c=0;c<list.length;c++) drawBox(list[c], project);
+    for(var i=0;i<4;i++){var p=project(corners[i].x,corners[i].y,corners[i].z);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);}
+    ctx.closePath(); ctx.fillStyle="#0d2615"; ctx.fill(); ctx.strokeStyle="#2ecc71"; ctx.lineWidth=2; ctx.stroke();
+    var list=threeD.components.slice();
+    list.sort(function(a,b){return (a.x*sinA+a.y*cosA)-(b.x*sinA+b.y*cosA);});
+    for(var c=0;c<list.length;c++) drawBox(list[c],project);
   }
-
-  function drawBox(comp, project){
-    var ctx = threeD.ctx;
-    var x1 = comp.x - comp.w/2, x2 = comp.x + comp.w/2;
-    var y1 = comp.y - comp.h/2, y2 = comp.y + comp.h/2;
-    var zt = comp.z;
-    var p1 = project(x1,y1,zt), p2 = project(x2,y1,zt), p3 = project(x2,y2,zt), p4 = project(x1,y2,zt);
-    var b1 = project(x1,y1,0), b2 = project(x2,y1,0), b3 = project(x2,y2,0), b4 = project(x1,y2,0);
-    ctx.fillStyle = shade(comp.color, -0.3);
-    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.lineTo(b2.x,b2.y); ctx.lineTo(b1.x,b1.y); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(p2.x,p2.y); ctx.lineTo(p3.x,p3.y); ctx.lineTo(b3.x,b3.y); ctx.lineTo(b2.x,b2.y); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(p3.x,p3.y); ctx.lineTo(p4.x,p4.y); ctx.lineTo(b4.x,b4.y); ctx.lineTo(b3.x,b3.y); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(p4.x,p4.y); ctx.lineTo(p1.x,p1.y); ctx.lineTo(b1.x,b1.y); ctx.lineTo(b4.x,b4.y); ctx.closePath(); ctx.fill();
-    var isHover = (threeD.hover === comp.key), isSel = (threeD.selected === comp.key);
-    ctx.fillStyle = isSel ? shade(comp.stroke, 0.3) : (isHover ? shade(comp.color, 0.3) : comp.color);
-    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.lineTo(p3.x,p3.y); ctx.lineTo(p4.x,p4.y); ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = comp.stroke; ctx.lineWidth = 2; ctx.stroke();
-    if (isHover || isSel){
-      ctx.fillStyle = "#fff"; ctx.font = "bold 14px Segoe UI"; ctx.textAlign = "center";
-      ctx.fillText(comp.name, (p1.x+p3.x)/2, (p1.y+p3.y)/2 - 5);
-    }
+  function drawBox(comp,project){
+    var ctx=threeD.ctx;
+    var x1=comp.x-comp.w/2,x2=comp.x+comp.w/2,y1=comp.y-comp.h/2,y2=comp.y+comp.h/2,zt=comp.z;
+    var p1=project(x1,y1,zt),p2=project(x2,y1,zt),p3=project(x2,y2,zt),p4=project(x1,y2,zt);
+    var b1=project(x1,y1,0),b2=project(x2,y1,0),b3=project(x2,y2,0),b4=project(x1,y2,0);
+    ctx.fillStyle=shade(comp.color,-0.3);
+    ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.lineTo(b2.x,b2.y);ctx.lineTo(b1.x,b1.y);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(p2.x,p2.y);ctx.lineTo(p3.x,p3.y);ctx.lineTo(b3.x,b3.y);ctx.lineTo(b2.x,b2.y);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(p3.x,p3.y);ctx.lineTo(p4.x,p4.y);ctx.lineTo(b4.x,b4.y);ctx.lineTo(b3.x,b3.y);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(p4.x,p4.y);ctx.lineTo(p1.x,p1.y);ctx.lineTo(b1.x,b1.y);ctx.lineTo(b4.x,b4.y);ctx.closePath();ctx.fill();
+    var isHover=(threeD.hover===comp.key),isSel=(threeD.selected===comp.key);
+    ctx.fillStyle=isSel?shade(comp.stroke,0.3):(isHover?shade(comp.color,0.3):comp.color);
+    ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.lineTo(p3.x,p3.y);ctx.lineTo(p4.x,p4.y);ctx.closePath();
+    ctx.fill(); ctx.strokeStyle=comp.stroke; ctx.lineWidth=2; ctx.stroke();
+    if(isHover||isSel){ ctx.fillStyle="#fff";ctx.font="bold 14px Segoe UI";ctx.textAlign="center";ctx.fillText(comp.name,(p1.x+p3.x)/2,(p1.y+p3.y)/2-5); }
   }
-
-  function shade(hex, amt){
-    if (hex.charAt(0) !== "#") return hex;
-    var r = parseInt(hex.substr(1,2),16), g = parseInt(hex.substr(3,2),16), b = parseInt(hex.substr(5,2),16);
-    r = Math.max(0, Math.min(255, Math.round(r + r*amt)));
-    g = Math.max(0, Math.min(255, Math.round(g + g*amt)));
-    b = Math.max(0, Math.min(255, Math.round(b + b*amt)));
-    return "rgb(" + r + "," + g + "," + b + ")";
+  function shade(hex,amt){
+    if(hex.charAt(0)!=="#") return hex;
+    var r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+    r=Math.max(0,Math.min(255,Math.round(r+r*amt)));g=Math.max(0,Math.min(255,Math.round(g+g*amt)));b=Math.max(0,Math.min(255,Math.round(b+b*amt)));
+    return "rgb("+r+","+g+","+b+")";
   }
-
   function hitTest3D(e){
-    var rect = threeD.canvas.getBoundingClientRect();
-    var mx = (e.clientX - rect.left) * (threeD.canvas.width / rect.width);
-    var my = (e.clientY - rect.top)  * (threeD.canvas.height / rect.height);
-    var cosA = Math.cos(threeD.angle), sinA = Math.sin(threeD.angle);
-    var cx = threeD.canvas.width/2, cy = threeD.canvas.height/2;
-    function project(x, y, z){ var xr = x*cosA - y*sinA, yr = x*sinA + y*cosA; return { x: cx + xr + yr*0.35, y: cy + yr*0.65 - z }; }
-    for (var i=0;i<threeD.components.length;i++){
-      var c = threeD.components[i];
-      var p1 = project(c.x-c.w/2, c.y-c.h/2, c.z), p3 = project(c.x+c.w/2, c.y+c.h/2, c.z);
-      var minX = Math.min(p1.x,p3.x), maxX = Math.max(p1.x,p3.x);
-      var minY = Math.min(p1.y,p3.y), maxY = Math.max(p1.y,p3.y);
-      if (mx >= minX-5 && mx <= maxX+5 && my >= minY-5 && my <= maxY+5) return c;
+    var rect=threeD.canvas.getBoundingClientRect();
+    var mx=(e.clientX-rect.left)*(threeD.canvas.width/rect.width);
+    var my=(e.clientY-rect.top)*(threeD.canvas.height/rect.height);
+    var cosA=Math.cos(threeD.angle),sinA=Math.sin(threeD.angle);
+    var cx=threeD.canvas.width/2,cy=threeD.canvas.height/2;
+    function project(x,y,z){var xr=x*cosA-y*sinA,yr=x*sinA+y*cosA;return{x:cx+xr+yr*0.35,y:cy+yr*0.65-z};}
+    for(var i=0;i<threeD.components.length;i++){
+      var c=threeD.components[i];
+      var p1=project(c.x-c.w/2,c.y-c.h/2,c.z),p3=project(c.x+c.w/2,c.y+c.h/2,c.z);
+      var minX=Math.min(p1.x,p3.x),maxX=Math.max(p1.x,p3.x),minY=Math.min(p1.y,p3.y),maxY=Math.max(p1.y,p3.y);
+      if(mx>=minX-5&&mx<=maxX+5&&my>=minY-5&&my<=maxY+5) return c;
     }
     return null;
   }
-
-  $("tabSvg").addEventListener("click", function(){
-    $("tabSvg").className = "tabBtn active";
-    $("tab3D").className = "tabBtn";
-    $("boardSvgWrap").style.display = "block";
-    $("board3DWrap").style.display = "none";
+  $("tabSvg").addEventListener("click",function(){
+    $("tabSvg").className="tabBtn active"; $("tab3D").className="tabBtn";
+    $("boardSvgWrap").style.display="block"; $("board3DWrap").style.display="none";
   });
-  $("tab3D").addEventListener("click", function(){
-    if (!threeDUnlocked){ showTip("Сначала сопоставьте все 9 компонентов", 2000); return; }
-    $("tabSvg").className = "tabBtn";
-    $("tab3D").className = "tabBtn active";
-    $("boardSvgWrap").style.display = "none";
-    $("board3DWrap").style.display = "block";
-    if (threeD.ctx) draw3D();
+  $("tab3D").addEventListener("click",function(){
+    if(!threeDUnlocked){ showTip("Сначала сопоставьте все 9 компонентов",2000); return; }
+    $("tabSvg").className="tabBtn"; $("tab3D").className="tabBtn active";
+    $("boardSvgWrap").style.display="none"; $("board3DWrap").style.display="block";
+    if(threeD.ctx) draw3D();
   });
 
-  /* ============================================================
-     ЭТАП 2: СОВМЕСТИМОСТЬ (3 платы × 5 утверждений)
-     ============================================================ */
-  var BOARDS = [
-    { name:"MSI MAG X870E TOMAHAWK MAX WIFI",
-      socket:"Socket AM5", memory:"DDR5", pcie:"PCIe 5.0",
-      items:[
-        {text:"Процессор AMD Ryzen 7 7800X3D (Socket AM5)", ok:true},
-        {text:"Процессор Intel Core i7-14700K (LGA1700)", ok:false},
-        {text:"Память DDR5-6000 32GB", ok:true},
-        {text:"Память DDR4-3200 16GB", ok:false},
-        {text:"Накопитель M.2 NVMe PCIe 5.0", ok:true}
-      ]},
-    { name:"ASUS ROG STRIX B760-F GAMING WIFI",
-      socket:"Socket LGA1700 (Intel)", memory:"DDR5", pcie:"PCIe 5.0",
-      items:[
-        {text:"Процессор Intel Core i5-14600K (LGA1700)", ok:true},
-        {text:"Процессор AMD Ryzen 5 7600 (Socket AM5)", ok:false},
-        {text:"Память DDR5-5600 16GB", ok:true},
-        {text:"Память DDR4-3200 16GB", ok:false},
-        {text:"Видеокарта PCIe 5.0", ok:true}
-      ]},
-    { name:"Gigabyte B550 AORUS ELITE V2",
-      socket:"Socket AM4 (AMD Ryzen 5000)", memory:"DDR4", pcie:"PCIe 4.0",
-      items:[
-        {text:"Процессор AMD Ryzen 5 5600X (Socket AM4)", ok:true},
-        {text:"Процессор AMD Ryzen 7 7800X3D (Socket AM5)", ok:false},
-        {text:"Память DDR4-3200 16GB", ok:true},
-        {text:"Память DDR5-6000 32GB", ok:false},
-        {text:"Видеокарта PCIe 4.0", ok:true}
-      ]}
+  /* ============ ЭТАП 2 ============ */
+  var BOARDS=[
+    {name:"MSI MAG X870E TOMAHAWK",socket:"Socket AM5",memory:"DDR5",pcie:"PCIe 5.0",items:[
+      {text:"AMD Ryzen 7 7800X3D (AM5)",ok:true},
+      {text:"Intel Core i7-14700K (LGA1700)",ok:false},
+      {text:"Память DDR5-6000 32GB",ok:true},
+      {text:"Память DDR4-3200 16GB",ok:false},
+      {text:"Накопитель M.2 NVMe PCIe 5.0",ok:true}
+    ]},
+    {name:"ASUS ROG STRIX B760-F",socket:"LGA1700 (Intel)",memory:"DDR5",pcie:"PCIe 5.0",items:[
+      {text:"Intel Core i5-14600K (LGA1700)",ok:true},
+      {text:"AMD Ryzen 5 7600 (AM5)",ok:false},
+      {text:"Память DDR5-5600 16GB",ok:true},
+      {text:"Память DDR4-3200 16GB",ok:false},
+      {text:"Видеокарта PCIe 5.0",ok:true}
+    ]},
+    {name:"Gigabyte B550 AORUS ELITE V2",socket:"Socket AM4",memory:"DDR4",pcie:"PCIe 4.0",items:[
+      {text:"AMD Ryzen 5 5600X (AM4)",ok:true},
+      {text:"AMD Ryzen 7 7800X3D (AM5)",ok:false},
+      {text:"Память DDR4-3200 16GB",ok:true},
+      {text:"Память DDR5-6000 32GB",ok:false},
+      {text:"Видеокарта PCIe 4.0",ok:true}
+    ]}
   ];
-
   function initStage2_showBoard(idx){
-    S.stage2.boardIdx = idx;
-    var b = BOARDS[idx];
-    $("s2_progress").innerHTML = "Плата <b>" + (idx+1) + " из " + BOARDS.length + "</b>. Правильных ответов: <b>" + S.stage2.correctTotal + "</b> из " + (idx*5);
-    $("s2_currentBoard").innerHTML = "<div class='card' style='background:#1a2331;'><b>" + b.name + "</b><br><span class='hint'>" + b.socket + " · " + b.memory + " · " + b.pcie + "</span></div>";
-    var list = $("compatList");
-    list.innerHTML = "";
-    for (var i=0;i<b.items.length;i++){
-      var lab = document.createElement("label");
-      lab.style.display = "block";
-      lab.style.margin = "8px 0";
-      lab.innerHTML = "<input type='checkbox' data-idx='" + i + "'> " + b.items[i].text;
+    S.stage2.boardIdx=idx;
+    var b=BOARDS[idx];
+    $("s2_progress").innerHTML="Плата <b>"+(idx+1)+"/"+BOARDS.length+"</b>. Правильных: <b>"+S.stage2.correctTotal+"</b>";
+    $("s2_currentBoard").innerHTML="<div class='card' style='background:#1a2331;'><b>"+b.name+"</b><br><span class='hint'>"+b.socket+" · "+b.memory+" · "+b.pcie+"</span></div>";
+    var list=$("compatList"); list.innerHTML="";
+    for(var i=0;i<b.items.length;i++){
+      var lab=document.createElement("label");
+      lab.style.display="block"; lab.style.margin="8px 0";
+      lab.innerHTML="<input type='checkbox' data-idx='"+i+"'> "+b.items[i].text;
       list.appendChild(lab);
     }
   }
-
-  $("btnStage2").addEventListener("click", function(){
-    var b = BOARDS[S.stage2.boardIdx];
-    var correct = 0;
-    var boxes = $("compatList").querySelectorAll("input[type=checkbox]");
-    for (var i=0;i<boxes.length;i++){
-      var idx = parseInt(boxes[i].getAttribute("data-idx"), 10);
-      if (boxes[i].checked === b.items[idx].ok) correct++;
+  $("btnStage2").addEventListener("click",function(){
+    var b=BOARDS[S.stage2.boardIdx],correct=0;
+    var boxes=$("compatList").querySelectorAll("input[type=checkbox]");
+    for(var i=0;i<boxes.length;i++){
+      var idx=parseInt(boxes[i].getAttribute("data-idx"),10);
+      if(boxes[i].checked===b.items[idx].ok) correct++;
     }
-    S.stage2.correctTotal += correct;
-    log("Этап 2: плата " + (S.stage2.boardIdx+1) + " — верно " + correct + "/5");
-    if (S.stage2.boardIdx < BOARDS.length - 1){
-      showTip("Плата " + (S.stage2.boardIdx+1) + ": " + correct + "/5. Переходим к следующей.", 2000);
-      initStage2_showBoard(S.stage2.boardIdx + 1);
+    S.stage2.correctTotal+=correct;
+    log("Этап 2: плата "+(S.stage2.boardIdx+1)+" — "+correct+"/5");
+    if(S.stage2.boardIdx<BOARDS.length-1){
+      showTip("Плата "+(S.stage2.boardIdx+1)+": "+correct+"/5",2000);
+      initStage2_showBoard(S.stage2.boardIdx+1);
     } else {
-      S.stage2.score = Math.round(S.stage2.correctTotal / 15 * 15);
-      S.stage2.status = "сдано";
-      log("Этап 2 завершён: " + S.stage2.correctTotal + "/15, балл " + S.stage2.score + "/15");
-      showTip("Этап 2: " + S.stage2.score + "/15", 2500);
-      refreshStageNav();
-      setTimeout(function(){ goToStage(3); }, 900);
+      S.stage2.score=Math.round(S.stage2.correctTotal/15*8);
+      S.stage2.status="сдано";
+      log("Этап 2: "+S.stage2.correctTotal+"/15 = "+S.stage2.score+"/8");
+      showTip("Этап 2: "+S.stage2.score+"/8",2500);
+      refreshStageNav(); setTimeout(function(){goToStage(3);},900);
     }
   });
 
-  /* ============================================================
-     ЭТАП 3: МОНТАЖ В 3D
-     ============================================================ */
-  var S3 = {
-    step:1,
-    ioDone:false,
-    standsDone:false,
-    boardDone:false,
-    screwsDone:false,
-    stands:[],
-    correctStands:["A1","A2","A3","B1","B2","B3","C1","C2","C3"],
-    allStands:["A1","A2","A3","A4","B1","B2","B3","B4","C1","C2","C3","C4","D1","D2","D3","D4"],
-    activeStands:{},
-    screwOrder:["A1","C3","A3","C1","A2","B3","C2","B1","B2"],
-    screwUser:[],
-    angle:-0.35,
-    dragging:false, lastX:0,
-    hoverHole:null,
-    draggingBoard:false,
-    boardPos:{x:-350, y:0},
-    screwState:{},
-    canvas:null, ctx:null
+  /* ============ ЭТАП 3: ОПОЗНАНИЕ РАЗЪЁМОВ + ТЕОРИЯ ============ */
+  var CONNECTOR_TYPES = {
+    atx24:  { n:"24-pin ATX", sh:"24", pat:[[12,2]], r:4, s:"кабель БП, самый широкий" },
+    eps:    { n:"8-pin EPS (CPU)", sh:"8", pat:[[4,2]], r:5, s:"кабель БП, одним блоком" },
+    pcie:   { n:"PCIe 6+2-pin", sh:"8", pat:[[3,2],[1,2]], r:5, s:"кабель БП, 2 контакта отделяются" },
+    v12:    { n:"12V-2x6 (16-pin)", sh:"v", pat:[[6,2],[4,1]], r:4, s:"для мощных видеокарт" },
+    satap:  { n:"SATA power (15-pin)", sh:"sp", pat:[[15,1]], r:3, s:"кабель БП, плоский" },
+    satad:  { n:"SATA data (7-pin)", sh:"sd", pat:[[7,1]], r:4, s:"между платой и накопителем" },
+    molex:  { n:"Molex 4-pin", sh:"mx", pat:[[4,1]], r:8, s:"кабель БП, старый" },
+    usb3:   { n:"USB 3.0 header (19-pin)", sh:"u3", pat:[[10,2]], r:3, s:"кабель корпуса" },
+    aud:    { n:"HD Audio (9-pin)", sh:"au", pat:[[5,2]], r:4, s:"кабель корпуса" },
+    fan:    { n:"Вентилятор 4-pin PWM", sh:"fn", pat:[[4,1]], r:4, s:"кабель вентилятора" }
+  };
+  var CONNECTOR_KEYS = ["atx24","eps","pcie","v12","satap","satad","molex","usb3","aud","fan"];
+
+  var SID = {
+    tab:0,
+    ans:{},          // ответы на теорию T1-T4
+    pinSel:null,
+    pinFound:{},
+    ident:{},        // опознание разъёмов (ответы)
+    identScore:null  // балл за первую проверку
   };
 
+  // Распиновка 24-pin
+  var CM={o:"#e67e22",k:"#222",r:"#e74c3c",g:"#999",p:"#9b59b6",y:"#f1c40f",b:"#3498db",n:"#2ecc71",w:"#eee"};
+  var V33=["o","+3,3 В","≈ +3,3 В"],GN=["k","GND","земля, 0 В"],V5=["r","+5 В","≈ +5 В"],V12=["y","+12 В","≈ +12 В"];
+  var PINS=[V33,V33,GN,V5,GN,V5,GN,["g","PWR_OK","сигнал «питание в норме»"],["p","+5VSB","дежурное +5 В"],V12,V12,V33,V33,["b","−12 В","≈ −12 В"],GN,["n","PS_ON","≈ +5 В; БП включится, если замкнуть на GND"],GN,GN,GN,["w","не используется","свободный контакт"],V5,V5,V5,GN];
+
+  var LES=[
+    { t:"Т1. Блок питания и напряжения", vis:pinw,
+      x:"<h3>Что даёт блок питания</h3><p>БП превращает сеть 220 В в постоянные напряжения <b>+3,3 В</b>, <b>+5 В</b> и <b>+12 В</b>. Основной разъём — <b>24-pin ATX</b>. Провода различаются цветом: <b>жёлтый</b> — +12 В, <b>красный</b> — +5 В, <b>оранжевый</b> — +3,3 В, <b>чёрный</b> — земля.</p><p>Сигналы: <b>PS_ON</b> (зелёный) — БП включается при замыкании на GND; <b>PWR_OK</b> (серый) — «питание в норме»; <b>+5VSB</b> (фиолетовый) — дежурное питание.</p><p><b>Попробуйте:</b> кликайте контакты на схеме справа.</p>",
+      q:[
+        {t:"Какой контакт замыкают на GND, чтобы запустить БП без платы?", o:["PS_ON (зелёный)","PWR_OK (серый)","+5VSB (фиолетовый)"], a:0, e:"PS_ON — сигнал включения."},
+        {t:"Что означают чёрные контакты 24-pin?", o:["Земля (GND)","+12 В","Сигнал включения"], a:0, e:"Чёрные провода — общая земля."}
+      ]
+    },
+    { t:"Т2. Питание процессора и видеокарты", vis:pv(["eps","pcie","v12"]),
+      x:"<h3>EPS, PCIe и 12V-2x6</h3><p><b>8-pin EPS</b> питает процессор. <b>PCIe 6+2-pin</b> — видеокарту. <b>12V-2x6</b> (16-pin) — один кабель для мощных видеокарт.</p><p>EPS и PCIe выглядят похоже, но <b>распиновка разная</b>.</p>",
+      q:[
+        {t:"Каким кабелем питается процессор?", o:["8-pin EPS","PCIe 6+2-pin","SATA power"], a:0, e:"EPS идёт к разъёму CPU рядом с сокетом."},
+        {t:"Что будет, если в CPU-разъём воткнуть кабель PCIe?", o:["Ничего, они одинаковы","Распиновка другая — плата не стартует","ПК станет быстрее"], a:1, e:"Разъёмы похожи, но распиновка разная."},
+        {t:"Каким кабелем питают мощные видеокарты нового поколения?", o:["12V-2x6 (16-pin)","Molex","24-pin ATX"], a:0, e:"12V-2x6 заменяет несколько 8-pin."}
+      ]
+    },
+    { t:"Т3. Накопители", vis:pv(["satap","satad","molex"]),
+      x:"<h3>SATA и M.2</h3><p><b>SATA</b>-накопителю нужны <b>два кабеля</b>: питание (15-pin) и данные (7-pin). Без любого — «No bootable device».</p><p><b>M.2 NVMe</b> кабелей не требует.</p>",
+      q:[
+        {t:"Что нужно подключить SATA-накопителю?", o:["Только SATA data","SATA power и SATA data","Только Molex"], a:1, e:"Питание и данные идут по разным кабелям."},
+        {t:"Как подключается M.2 NVMe SSD?", o:["Прямо в слот платы, без кабелей","Через SATA data","Через Molex"], a:0, e:"Питание и данные идут через слот."}
+      ]
+    },
+    { t:"Т4. Передняя панель и колодки платы", vis:pv(["usb3","aud","fan"]),
+      x:"<h3>F_PANEL, USB, аудио, вентиляторы</h3><p><b>F_PANEL</b>: Power SW и Reset SW — кнопки, полярности нет. <b>Power LED</b> и <b>HDD LED</b> — светодиоды, «+» к «+».</p><p><b>F_USB3</b> и <b>F_AUDIO</b> имеют ключ.</p>",
+      q:[
+        {t:"Как подключают светодиод корпуса к F_PANEL?", o:["По полярности: «+» к «+»","Как получится — полярности нет","Только в нижний ряд"], a:0, e:"При обратной полярности индикатор не светится."},
+        {t:"Чем отличаются ARGB (3-pin) и RGB (4-pin)?", o:["Ничем","Напряжением: 5 В и 12 В","Только цветом провода"], a:1, e:"12 В на ARGB может сжечь подсветку."}
+      ]
+    }
+  ];
+
+  function dots(t){
+    var x=6,rows=1,s="";
+    t.pat.forEach(function(g){
+      rows=Math.max(rows,g[1]);
+      for(var c=0;c<g[0];c++) for(var r=0;r<g[1];r++)
+        s+="<circle cx='"+(x+c*(t.r*2+4)+t.r)+"' cy='"+(8+r*(t.r*2+4)+t.r)+"' r='"+t.r+"' fill='#f0c040'/>";
+      x+=g[0]*(t.r*2+4)+12;
+    });
+    return "<svg width='"+x+"' height='"+(rows*(t.r*2+4)+14)+"' style='background:#0f141c;border-radius:6px;flex:none'>"+s+"</svg>";
+  }
+  function pinw(){
+    var s="<svg viewBox='0 0 370 100' style='width:100%;background:#0f141c;border-radius:8px'>",n,x,y,p;
+    for(n=1;n<=24;n++){
+      var i=n<=12?n-1:n-13;y=n<=12?66:30;x=24+i*28;p=PINS[n-1];
+      s+="<g data-pin='"+n+"' style='cursor:pointer'><circle cx='"+x+"' cy='"+y+"' r='11' fill='"+CM[p[0]]+"' stroke='"+(SID.pinSel==n?"#fff":(SID.pinFound[n]?"#2ecc71":"#555"))+"' stroke-width='"+(SID.pinSel==n?3:2)+"'/><text x='"+x+"' y='"+(y+4)+"' font-size='10' text-anchor='middle' fill='"+("kpb".indexOf(p[0])>=0?"#fff":"#000")+"'>"+n+"</text></g>";
+    }
+    var r=SID.pinSel?PINS[SID.pinSel-1]:null;
+    var c=(SID.pinFound[10]?1:0)+(SID.pinFound[11]?1:0);
+    return s+"</svg><div class='feedback' style='background:#1a2331'><b>Мультиметр:</b> "+(r?"контакт "+SID.pinSel+" — "+r[1]+" ("+r[2]+")":"кликните контакт")+"<br><b>Задание:</b> найдите оба контакта +12 В — "+c+" из 2"+(c==2?" <b class='ok'>✓</b>":"")+"</div>";
+  }
+  function pv(arr){
+    return function(){
+      return arr.map(function(k){return "<div class='hint'>"+CONNECTOR_TYPES[k].n+"</div>"+dots(CONNECTOR_TYPES[k]);}).join("");
+    };
+  }
+  function s3idQuestions(li){
+    var h="";
+    LES[li].q.forEach(function(q,i){
+      var k=li+"-"+i,a=SID.ans[k];
+      h+="<div class='feedback' style='background:#1a2331;color:#e8eef7'><b>"+q.t+"</b><br>";
+      q.o.forEach(function(o,j){
+        var c="chip"; if(a!=null){ if(j===q.a)c+=" ok2"; else if(j===a)c+=" no2"; }
+        h+="<span class='"+c+"' data-sidans='"+k+":"+j+"' style='display:inline-block;background:#334156;border:2px solid #55637a;border-radius:8px;padding:6px 10px;margin:4px;cursor:pointer;font-size:13px'>"+o+"</span>";
+      });
+      if(a!=null) h+="<div>"+(a===q.a?"<b class='ok'>✓ Верно. </b>":"<b class='bad'>✗ Неверно. </b>")+q.e+"</div>";
+      h+="</div>";
+    });
+    return h;
+  }
+
+  function sidTheoryPage(li){
+    var L=LES[li];
+    return "<div class='row'><div class='col'>"+L.x+"</div><div class='col'>"+L.vis()+s3idQuestions(li)+"</div></div><br><button class='secondary' data-sidtab='"+(li+1)+"'>Далее →</button>";
+  }
+  function sidIdentPage(){
+    var h="<h3>Опознание разъёмов</h3><p class='hint'>Определите название разъёма по форме и подсказке. Баллы — за первую проверку (макс. 6).</p>";
+    CONNECTOR_KEYS.forEach(function(k){
+      var a=SID.ident[k],m="";
+      if(SID.identScore!=null) m=a===k?" <b class='ok'>✓</b>":" <b class='bad'>✗ "+CONNECTOR_TYPES[k].n+"</b>";
+      h+="<div class='item' style='display:inline-flex;gap:10px;align-items:center;background:#1a2331;border-radius:8px;padding:10px;margin:6px;width:calc(50% - 16px);min-width:300px'>"+dots(CONNECTOR_TYPES[k])+"<div class='hint'>"+CONNECTOR_TYPES[k].s+"<br><select data-sidid='"+k+"' style='width:100%;margin-top:4px'><option value=''>— выберите —</option>"+CONNECTOR_KEYS.map(function(x){return "<option value='"+x+"'"+(a===x?" selected":"")+">"+CONNECTOR_TYPES[x].n+"</option>";}).join("")+"</select>"+m+"</div></div>";
+    });
+    h+="<br><button data-sidcheck='1'>Проверить опознание</button>";
+    if(SID.identScore!=null) h+=" <b>Баллы: "+SID.identScore+" / 6</b>";
+    h+="<br><br><button data-sidfinish='1' class='secondary'>Завершить этап 3</button>";
+    return h;
+  }
+
+  function initStage3id(){
+    SID.tab=0; SID.ans={}; SID.pinSel=null; SID.pinFound={}; SID.ident={}; SID.identScore=null;
+    s3idTabs();
+    s3idRender();
+  }
+  function s3idTabs(){
+    var tabs=["Т1 Питание","Т2 CPU/GPU","Т3 Накопители","Т4 Панель","Опознание"];
+    var h="";
+    for(var i=0;i<tabs.length;i++){
+      h+="<button class='tabBtn"+(SID.tab===i?" active":"")+"' data-sidtab='"+i+"'>"+tabs[i]+"</button>";
+    }
+    $("sidTabs").innerHTML=h;
+  }
+  function s3idRender(){
+    s3idTabs();
+    if(SID.tab<4) $("sidBody").innerHTML=sidTheoryPage(SID.tab);
+    else $("sidBody").innerHTML=sidIdentPage();
+  }
+
+  function s3idTheoryScore(){
+    var n=0;
+    LES.forEach(function(L,li){ L.q.forEach(function(q,i){ if(SID.ans[li+"-"+i]===q.a) n++; }); });
+    // pin-задание: макс +1 (оба +12В)
+    if(SID.pinFound[10]&&SID.pinFound[11]) n++;
+    // всего максимум = 9 правильных (8 вопросов + 1 за pin), но у нас всего 9 вопросов + 1 pin = 10 возможных
+    // На этап 3 отведено 6 баллов. Делим: теория = 3, опознание = 3
+    return Math.round(n*3/9*10)/10;
+  }
+
+  // Обработчики кликов для этапа 3
+  document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-pin]");
+    if(t){ var pn=+t.getAttribute("data-pin"); SID.pinSel=pn; if(PINS[pn-1][1]==="+12 В") SID.pinFound[pn]=1; s3idRender(); return; }
+    var t2=e.target.closest("[data-sidans]");
+    if(t2){
+      var pr=t2.getAttribute("data-sidans").split(":");
+      if(SID.ans[pr[0]]==null) SID.ans[pr[0]]=+pr[1];
+      s3idRender(); return;
+    }
+    var t3=e.target.closest("[data-sidtab]");
+    if(t3){ SID.tab=+t3.getAttribute("data-sidtab"); s3idRender(); return; }
+    var t4=e.target.closest("[data-sidcheck]");
+    if(t4){
+      if(SID.identScore!=null) return;
+      var n=0; CONNECTOR_KEYS.forEach(function(k){ if(SID.ident[k]===k) n++; });
+      SID.identScore=Math.round(n*3/10*10)/10; // макс 3 из 10
+      s3idRender(); return;
+    }
+    var t5=e.target.closest("[data-sidfinish]");
+    if(t5){
+      var th=s3idTheoryScore();
+      var id=SID.identScore!=null?SID.identScore:0;
+      S.stage3id.score=Math.min(6, th+id);
+      S.stage3id.status="сдано";
+      log("Этап 3: теория "+th+", опознание "+id+" = "+S.stage3id.score+"/6");
+      showTip("Этап 3: "+S.stage3id.score+"/6",2000);
+      refreshStageNav(); goToStage(4); return;
+    }
+  });
+  document.addEventListener("change",function(e){
+    var t=e.target;
+    if(t.getAttribute&&t.getAttribute("data-sidid")){
+      SID.ident[t.getAttribute("data-sidid")]=t.value;
+    }
+  });
+
+  /* ============ ЭТАП 4: КАБЕЛИ ИЗ МОДУЛЬНОГО БП ============ */
+  var P1KEYS=["atx24","eps","pcie","v12","satap","satad","molex"];
+  var CONFIGS=[
+    {n:"видеокарта 2×8-pin, 2 накопителя SATA",g:"pcie",ng:2,k:2},
+    {n:"видеокарта 12V-2x6, 3 накопителя SATA",g:"v12",ng:1,k:3},
+    {n:"видеокарта 1×8-pin, 2 накопителя SATA",g:"pcie",ng:1,k:2}
+  ];
+  function cfgHash(s){ var h=0; for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h; }
+
+  function initStage4c(){
+    S.stage4c.cfg = CONFIGS[cfgHash(S.fio||"x")%3];
+    S.stage4c.q = {};
+    S.stage4c.score = null;
+    s4cRender();
+  }
+  function s4cNeed(){
+    var c=S.stage4c.cfg;
+    return {atx24:1, eps:1, pcie:c.g==="pcie"?c.ng:0, v12:c.g==="v12"?1:0, satap:c.k, satad:c.k, molex:0};
+  }
+  function s4cRender(){
+    var c=S.stage4c.cfg, n=s4cNeed();
+    var RS={atx24:"на материнскую плату",eps:"на процессор",pcie:"по 1 на каждое 8-pin гнездо видеокарты",v12:"если у видеокарты 12V-2x6",satap:"по 1 на каждый накопитель",satad:"по 1 на каждый накопитель",molex:"в этой сборке не нужен"};
+    var h="<p class='hint'>Укажите, сколько кабелей каждого типа взять из коробки. Баллы — за первую проверку (макс. 6).</p>";
+    h+="<div class='feedback' style='background:#1a2331;color:#e8eef7'><b>Состав вашей сборки</b><br>• Плата: 24-pin ×1, CPU 8-pin ×1<br>• Видеокарта: "+(c.g==="pcie"?c.ng+" × 8-pin":"1 × 12V-2x6")+"<br>• Накопители SATA: "+c.k+" (каждому 2 кабеля)<br><b>Правило:</b> один разъём — один кабель.</div>";
+    h+="<table style='width:100%'>";
+    P1KEYS.forEach(function(k){
+      var q=S.stage4c.q[k]||0, o="";
+      for(var i=0;i<5;i++) o+="<option"+(q===i?" selected":"")+">"+i+"</option>";
+      var m=S.stage4c.score!=null?(q===n[k]?" <b class='ok'>✓</b>":" <b class='bad'>✗ нужно "+n[k]+" ("+RS[k]+")</b>"):"";
+      h+="<tr><td>"+dots(CONNECTOR_TYPES[k])+"</td><td>"+CONNECTOR_TYPES[k].n+"</td><td><select data-s4cq='"+k+"'>"+o+"</select>"+m+"</td></tr>";
+    });
+    h+="</table><br><button data-s4ccheck='1'>Проверить</button>";
+    if(S.stage4c.score!=null) h+=" <b>Баллы: "+S.stage4c.score+" / 6</b>";
+    h+="<br><br><button class='secondary' data-s4cfinish='1'>Завершить этап 4</button>";
+    $("s4cBody").innerHTML=h;
+  }
+  document.addEventListener("change",function(e){
+    var t=e.target;
+    if(t.getAttribute&&t.getAttribute("data-s4cq")){
+      S.stage4c.q[t.getAttribute("data-s4cq")]=+t.value;
+    }
+  });
+  document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-s4ccheck]");
+    if(t){
+      if(S.stage4c.score!=null) return;
+      var n=s4cNeed(), ok=0;
+      P1KEYS.forEach(function(k){ if((S.stage4c.q[k]||0)===n[k]) ok++; });
+      S.stage4c.score=Math.round(ok*6/7*10)/10;
+      s4cRender(); return;
+    }
+    var t2=e.target.closest("[data-s4cfinish]");
+    if(t2){
+      if(S.stage4c.score==null){
+        var n=s4cNeed(), ok=0;
+        P1KEYS.forEach(function(k){ if((S.stage4c.q[k]||0)===n[k]) ok++; });
+        S.stage4c.score=Math.round(ok*6/7*10)/10;
+      }
+      S.stage4c.status="сдано";
+      log("Этап 4: "+S.stage4c.score+"/6");
+      showTip("Этап 4: "+S.stage4c.score+"/6",2000);
+      refreshStageNav(); goToStage(5); return;
+    }
+  });
+
+  /* ============ ЭТАП 5: МОНТАЖ 3D ============ */
+  var CORRECT_STANDS=["A1","A2","A3","B1","B2","B3","C1","C2","C3"];
+  var SCREW_ORDER=["A1","C3","A3","C1","A2","B3","C2","B1","B2"];
+  var S3={step:1,ioDone:false,standsDone:false,boardDone:false,activeStands:{},screwUser:[],angle:-0.35,dragging:false,lastX:0,hoverHole:null,draggingBoard:false,boardPos:{x:-350,y:0},screwState:{},canvas:null,ctx:null,canvasW:1000,canvasH:560};
+
   function initStage3(){
-    S3.canvas = $("stage3Canvas");
-    S3.ctx = S3.canvas.getContext("2d");
-    S3.step = 1;
-    S3.ioDone = false;
-    S3.standsDone = false;
-    S3.boardDone = false;
-    S3.screwsDone = false;
-    S3.activeStands = {};
-    S3.screwUser = [];
-    S3.screwState = {};
-    S3.angle = -0.35;
-    S3.boardPos = { x:-350, y:0 };
-
+    S3.canvas=$("stage3Canvas"); S3.ctx=S3.canvas.getContext("2d");
+    S3.step=1; S3.ioDone=false; S3.standsDone=false; S3.boardDone=false;
+    S3.activeStands={}; S3.screwUser=[]; S3.screwState={}; S3.angle=-0.35; S3.boardPos={x:-350,y:0};
     s3_setStep(1);
-    s3_renderLeft();
-
-    // вращение
-    S3.canvas.addEventListener("mousedown", function(e){
-      if (S3.step === 3 && s3_hitBoard(e)){
-        S3.draggingBoard = true;
-        return;
-      }
-      S3.dragging = true;
-      S3.lastX = e.clientX;
-      S3.canvas.className = "grabbing";
+    S3.canvas.addEventListener("mousedown",function(e){
+      if(S3.step===3&&s3_hitBoard(e)){S3.draggingBoard=true;return;}
+      S3.dragging=true; S3.lastX=e.clientX; S3.canvas.className="grabbing";
     });
-    window.addEventListener("mousemove", function(e){
-      if (S3.draggingBoard){
-        var rect = S3.canvas.getBoundingClientRect();
-        S3.boardPos.x = (e.clientX - rect.left - S3.canvas.width/2) * (S3.canvas.width / rect.width);
-        S3.boardPos.y = (e.clientY - rect.top - S3.canvas.height/2) * (S3.canvas.height / rect.height) * 0.6;
-        draw3DStage();
-        return;
+    window.addEventListener("mousemove",function(e){
+      if(S3.draggingBoard){
+        var rect=S3.canvas.getBoundingClientRect();
+        S3.boardPos.x=(e.clientX-rect.left-S3.canvas.width/2)*(S3.canvasW/rect.width);
+        S3.boardPos.y=(e.clientY-rect.top-S3.canvas.height/2)*(S3.canvasH/rect.height)*0.6;
+        draw3DStage(); return;
       }
-      if (!S3.dragging) return;
-      S3.angle += (e.clientX - S3.lastX) * 0.008;
-      S3.lastX = e.clientX;
-      draw3DStage();
+      if(!S3.dragging) return;
+      S3.angle+=(e.clientX-S3.lastX)*0.008; S3.lastX=e.clientX; draw3DStage();
     });
-    window.addEventListener("mouseup", function(e){
-      if (S3.draggingBoard){
-        S3.draggingBoard = false;
-        s3_checkBoardDrop();
-      }
-      if (S3.dragging){ S3.dragging = false; S3.canvas.className = ""; }
+    window.addEventListener("mouseup",function(){
+      if(S3.draggingBoard){S3.draggingBoard=false;s3_checkBoardDrop();}
+      if(S3.dragging){S3.dragging=false;S3.canvas.className="";}
     });
-    S3.canvas.addEventListener("mousemove", function(e){
-      var h = s3_hitHole(e);
-      S3.hoverHole = h ? h.id : null;
-      if (S3.step === 2) draw3DStage();
+    S3.canvas.addEventListener("mousemove",function(e){
+      var h=s3_hitHole(e); S3.hoverHole=h?h.id:null; if(S3.step===2) draw3DStage();
     });
-    S3.canvas.addEventListener("click", function(e){
-      if (S3.step === 1) return;
-      if (S3.step === 2){
-        var h = s3_hitHole(e);
-        if (h) s3_toggleStand(h.id);
-      }
-      if (S3.step === 4){
-        var s = s3_hitScrew(e);
-        if (s) s3_tightenScrew(s.id);
-      }
+    S3.canvas.addEventListener("click",function(e){
+      if(S3.step===1) return;
+      if(S3.step===2){var h=s3_hitHole(e);if(h)s3_toggleStand(h.id);}
+      if(S3.step===4){var s=s3_hitScrew(e);if(s)s3_tightenScrew(s.id);}
     });
-
-    // drag-and-drop I/O shield в canvas через DataTransfer
-    S3.canvas.addEventListener("dragover", function(e){ e.preventDefault(); });
-    S3.canvas.addEventListener("drop", function(e){
-      e.preventDefault();
-      var id = e.dataTransfer.getData("text/plain");
-      if (S3.step === 1){
-        s3_pickIO(id);
-      }
+    S3.canvas.addEventListener("dragover",function(e){e.preventDefault();});
+    S3.canvas.addEventListener("drop",function(e){
+      e.preventDefault(); var id=e.dataTransfer.getData("text/plain");
+      if(S3.step===1) s3_pickIO(id);
     });
-
     draw3DStage();
   }
-
   function s3_setStep(n){
-    S3.step = n;
-    var titles = ["Шаг 1: I/O shield","Шаг 2: Стойки","Шаг 3: Укладка платы","Шаг 4: Винты"];
-    var hints = [
-      "Выберите правильный I/O shield и перетащите его в окно корпуса. Плата — форм-фактор ATX.",
-      "Кликните по отверстиям поддона, где должны быть стойки. Нужно 9 стоек.",
-      "Перетащите плату мышью в корпус. Разъёмы должны быть к задней стенке (справа).",
-      "Кликните по винтам в порядке крест-накрест: A1 → C3 → A3 → C1 → …"
-    ];
-    $("s3_hint").textContent = hints[n-1];
-    $("s3tab_io").className = "tabBtn" + (n===1 ? " active" : "");
-    $("s3tab_stands").className = "tabBtn" + (n===2 ? " active" : "");
-    $("s3tab_board").className = "tabBtn" + (n===3 ? " active" : "");
-    $("s3tab_screws").className = "tabBtn" + (n===4 ? " active" : "");
-    $("s3tab_stands").disabled = (n < 2);
-    $("s3tab_board").disabled = (n < 3);
-    $("s3tab_screws").disabled = (n < 4);
-    s3_renderLeft();
-    draw3DStage();
+    S3.step=n;
+    var hints=["Выберите I/O shield ATX и перетащите в окно.","Кликните по отверстиям, где стоят стойки. Нужно 9.","Перетащите плату в корпус. Разъёмы к задней стенке (справа).","Кликните по винтам крест-накрест: A1 → C3 → A3 → C1 → …"];
+    $("s3_hint").textContent=hints[n-1];
+    $("s3tab_io").className="tabBtn"+(n===1?" active":"");
+    $("s3tab_stands").className="tabBtn"+(n===2?" active":"");
+    $("s3tab_board").className="tabBtn"+(n===3?" active":"");
+    $("s3tab_screws").className="tabBtn"+(n===4?" active":"");
+    $("s3tab_stands").disabled=(n<2); $("s3tab_board").disabled=(n<3); $("s3tab_screws").disabled=(n<4);
+    s3_renderLeft(); draw3DStage();
   }
-
   function s3_renderLeft(){
-    var left = $("s3_left");
-    left.innerHTML = "";
-    if (S3.step === 1){
-      left.innerHTML = "<p><b>I/O shield:</b></p>";
-      var variants = [
-        { id:"io_atx", label:"ATX (стандарт)", color:"#f0c040" },
-        { id:"io_matx", label:"micro-ATX", color:"#3d8bff" },
-        { id:"io_itx", label:"mini-ITX", color:"#2ecc71" }
-      ];
-      for (var i=0;i<variants.length;i++){
+    var left=$("s3_left"); left.innerHTML="";
+    if(S3.step===1){
+      left.innerHTML="<p><b>I/O shield:</b></p>";
+      var variants=[{id:"io_atx",label:"ATX",color:"#f0c040"},{id:"io_matx",label:"micro-ATX",color:"#3d8bff"},{id:"io_itx",label:"mini-ITX",color:"#2ecc71"}];
+      for(var i=0;i<variants.length;i++){
         (function(v){
-          var el = document.createElement("div");
-          el.className = "boardVariant";
-          el.id = v.id;
+          var el=document.createElement("div"); el.className="boardVariant"; el.id=v.id;
           el.setAttribute("draggable","true");
-          el.innerHTML = "<span class='bvPin' style='background:" + v.color + "'></span> " + v.label;
-          el.addEventListener("dragstart", function(e){
-            if (S3.ioDone){ e.preventDefault(); return; }
-            e.dataTransfer.setData("text/plain", v.id);
+          el.innerHTML="<span class='bvPin' style='background:"+v.color+"'></span> "+v.label;
+          el.addEventListener("dragstart",function(e){
+            if(S3.ioDone){e.preventDefault();return;}
+            e.dataTransfer.setData("text/plain",v.id);
           });
           left.appendChild(el);
         })(variants[i]);
       }
     }
-    if (S3.step === 2){
-      left.innerHTML = "<p><b>Отверстия поддона:</b></p><p class='hint'>Кликните по 9 правильным. Красные — ошибочные.</p>";
-      left.innerHTML += "<p>Стоек активных: <b>" + Object.keys(S3.activeStands).length + "</b> / 9</p>";
-    }
-    if (S3.step === 3){
-      left.innerHTML = "<p><b>Материнская плата:</b></p><p class='hint'>Перетащите в корпус.</p>";
-    }
-    if (S3.step === 4){
-      left.innerHTML = "<p><b>Винты:</b></p><p class='hint'>Крест-накрест: A1 → C3 → A3 → C1 → A2 → B3 → C2 → B1 → B2.</p>";
-      left.innerHTML += "<p>Затянуто: <b>" + S3.screwUser.length + "</b> / 9</p>";
-    }
+    if(S3.step===2) left.innerHTML="<p><b>Отверстия:</b></p><p>Стоек: <b>"+Object.keys(S3.activeStands).length+"</b> / 9</p>";
+    if(S3.step===3) left.innerHTML="<p><b>Плата:</b> перетащите в корпус.</p>";
+    if(S3.step===4) left.innerHTML="<p><b>Винты:</b></p><p>Крест-накрест: A1→C3→A3→C1→...</p><p>Затянуто: <b>"+S3.screwUser.length+"</b> / 9</p>";
   }
-
   function s3_pickIO(id){
-    if (S3.ioDone) return;
-    if (id === "io_atx"){
-      S3.ioDone = true;
-      log("Этап 3.1: I/O shield ATX установлен");
-      showTip("✓ I/O shield ATX установлен", 1500);
-      setTimeout(function(){ s3_setStep(2); }, 800);
-    } else {
-      showTip("✗ Не тот форм-фактор", 1800);
-    }
+    if(S3.ioDone) return;
+    if(id==="io_atx"){ S3.ioDone=true; log("Этап 5.1: I/O shield ATX"); showTip("✓ I/O shield",1500); setTimeout(function(){s3_setStep(2);},800); }
+    else showTip("✗ Не тот форм-фактор",1800);
   }
-
   function s3_toggleStand(id){
-    if (S3.standsDone) return;
-    if (S3.activeStands[id]){
-      delete S3.activeStands[id];
-    } else {
-      S3.activeStands[id] = true;
-    }
-    var correct = 0, wrong = 0;
-    for (var k in S3.activeStands){
-      if (S3.correctStands.indexOf(k) !== -1) correct++;
-      else wrong++;
-    }
-    $("s3_standsCount").textContent = correct;
-    s3_renderLeft();
-    draw3DStage();
-    if (correct === 9 && wrong === 0){
-      S3.standsDone = true;
-      log("Этап 3.2: стойки верно");
-      showTip("✓ 9 стоек установлены верно", 1500);
-      setTimeout(function(){ s3_setStep(3); }, 900);
-    }
+    if(S3.standsDone) return;
+    if(S3.activeStands[id]) delete S3.activeStands[id]; else S3.activeStands[id]=true;
+    var correct=0,wrong=0;
+    for(var k in S3.activeStands) if(S3.activeStands.hasOwnProperty(k)){ if(CORRECT_STANDS.indexOf(k)!==-1) correct++; else wrong++; }
+    $("s3_standsCount").textContent=correct;
+    s3_renderLeft(); draw3DStage();
+    if(correct===9&&wrong===0){ S3.standsDone=true; log("Этап 5.2: стойки верно"); showTip("✓ 9 стоек",1500); setTimeout(function(){s3_setStep(3);},900); }
   }
-
-  function s3_hitBoard(e){
-    var rect = S3.canvas.getBoundingClientRect();
-    var mx = (e.clientX - rect.left) * (S3.canvas.width / rect.width);
-    var my = (e.clientY - rect.top)  * (S3.canvas.height / rect.height);
-    var cosA = Math.cos(S3.angle), sinA = Math.sin(S3.angle);
-    var cx = S3.canvas.width/2, cy = S3.canvas.height/2;
-    function project(x, y, z){
-      var xr = x*cosA - y*sinA, yr = x*sinA + y*cosA;
-      return { x: cx + xr + yr*0.35, y: cy + yr*0.65 - z };
-    }
-    var bx = S3.boardPos.x, by = S3.boardPos.y;
-    var corners = [[-200,-140],[200,-140],[200,140],[-200,140]];
-    var minX=9999,minY=9999,maxX=-9999,maxY=-9999;
-    for (var i=0;i<4;i++){
-      var p = project(bx+corners[i][0], by+corners[i][1], 5);
-      if (p.x<minX) minX=p.x; if (p.x>maxX) maxX=p.x;
-      if (p.y<minY) minY=p.y; if (p.y>maxY) maxY=p.y;
-    }
-    return (mx>=minX && mx<=maxX && my>=minY && my<=maxY);
+  function s3_standLocalPos(id){ var row=id.charCodeAt(0)-65,col=parseInt(id.charAt(1),10)-1; return {x:-200+col*200,y:-140+row*140}; }
+  function s3_projectFactory(){
+    var cx=S3.canvasW/2,cy=S3.canvasH/2+40,cosA=Math.cos(S3.angle),sinA=Math.sin(S3.angle);
+    return function(x,y,z){var xr=x*cosA-y*sinA,yr=x*sinA+y*cosA;return{x:cx+xr+yr*0.35,y:cy+yr*0.65-z};};
   }
-
-  function s3_checkBoardDrop(){
-    if (S3.boardDone) return;
-    // близко к центру поддона?
-    var dx = S3.boardPos.x, dy = S3.boardPos.y;
-    if (Math.abs(dx) < 70 && Math.abs(dy) < 50){
-      S3.boardDone = true;
-      S3.boardPos = { x:0, y:0 };
-      log("Этап 3.3: плата уложена верно");
-      showTip("✓ Плата уложена, разъёмы к задней стенке", 2000);
-      draw3DStage();
-      setTimeout(function(){ s3_setStep(4); s3_initScrews(); }, 900);
-    } else if (dx < -200){
-      showTip("✗ Разъёмы должны быть справа (к задней стенке)", 2000);
-    }
-  }
-
-  function s3_initScrews(){
-    S3.screwUser = [];
-    S3.screwState = {};
-    $("s3_screwsDone").textContent = "0";
-    $("s3_orderStatus").textContent = "—";
-    $("btnStage3").disabled = true;
-    draw3DStage();
-  }
- function s3_hitHole(e){
-    var rect = S3.canvas.getBoundingClientRect();
-    var mx = (e.clientX - rect.left) * (S3.canvas.width / rect.width);
-    var my = (e.clientY - rect.top)  * (S3.canvas.height / rect.height);
-    var cosA = Math.cos(S3.angle), sinA = Math.sin(S3.angle);
-    var cx = S3.canvas.width/2, cy = S3.canvas.height/2 + 40;
-    function project(x, y, z){
-      var xr = x*cosA - y*sinA, yr = x*sinA + y*cosA;
-      return { x: cx + xr + yr*0.35, y: cy + yr*0.65 - z };
-    }
-    for (var r=0;r<4;r++){
-      for (var col=0;col<4;col++){
-        var id = String.fromCharCode(65+r) + (col+1);
-        var lx = -200 + col * 200;
-        var ly = -140 + r * 140;
-        var hp = project(lx, ly, 1);
-        var d = Math.hypot(mx - hp.x, my - hp.y);
-        if (d < 18) return { id: id };
-      }
+  function s3_hitHole(e){
+    var rect=S3.canvas.getBoundingClientRect();
+    var mx=(e.clientX-rect.left)*(S3.canvasW/rect.width);
+    var my=(e.clientY-rect.top)*(S3.canvasH/rect.height);
+    var project=s3_projectFactory();
+    for(var r=0;r<4;r++) for(var col=0;col<4;col++){
+      var id=String.fromCharCode(65+r)+(col+1);
+      var hp=project(-200+col*200,-140+r*140,1);
+      if(Math.hypot(mx-hp.x,my-hp.y)<20) return {id:id};
     }
     return null;
   }
   function s3_hitScrew(e){
-    var rect = S3.canvas.getBoundingClientRect();
-    var mx = (e.clientX - rect.left) * (S3.canvas.width / rect.width);
-    var my = (e.clientY - rect.top)  * (S3.canvas.height / rect.height);
-    var cosA = Math.cos(S3.angle), sinA = Math.sin(S3.angle);
-    var cx = S3.canvas.width/2, cy = S3.canvas.height/2;
-    function project(x, y, z){
-      var xr = x*cosA - y*sinA, yr = x*sinA + y*cosA;
-      return { x: cx + xr + yr*0.35, y: cy + yr*0.65 - z };
-    }
-    for (var i=0;i<S3.correctStands.length;i++){
-      var id = S3.correctStands[i];
-      var pos = s3_standLocalPos(id);
-      var p = project(pos.x, pos.y, 7);
-      var d = Math.hypot(mx - p.x, my - p.y);
-      if (d < 22) return { id:id };
+    var rect=S3.canvas.getBoundingClientRect();
+    var mx=(e.clientX-rect.left)*(S3.canvasW/rect.width);
+    var my=(e.clientY-rect.top)*(S3.canvasH/rect.height);
+    var project=s3_projectFactory();
+    for(var i=0;i<CORRECT_STANDS.length;i++){
+      var pos=s3_standLocalPos(CORRECT_STANDS[i]);
+      var p=project(pos.x,pos.y,7);
+      if(Math.hypot(mx-p.x,my-p.y)<22) return {id:CORRECT_STANDS[i]};
     }
     return null;
   }
-
-  function s3_standLocalPos(id){
-    var row = id.charCodeAt(0) - 65;
-    var col = parseInt(id.charAt(1),10) - 1;
-    return { x: -200 + col * 200, y: -140 + row * 140 };
+  function s3_hitBoard(e){
+    var rect=S3.canvas.getBoundingClientRect();
+    var mx=(e.clientX-rect.left)*(S3.canvasW/rect.width);
+    var my=(e.clientY-rect.top)*(S3.canvasH/rect.height);
+    var project=s3_projectFactory();
+    var bx=S3.boardPos.x,by=S3.boardPos.y;
+    var corners=[[-200,-140],[200,-140],[200,140],[-200,140]];
+    var minX=9999,minY=9999,maxX=-9999,maxY=-9999;
+    for(var i=0;i<4;i++){var p=project(bx+corners[i][0],by+corners[i][1],5);if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;}
+    return (mx>=minX&&mx<=maxX&&my>=minY&&my<=maxY);
   }
-
+  function s3_checkBoardDrop(){
+    if(S3.boardDone) return;
+    var dx=S3.boardPos.x,dy=S3.boardPos.y;
+    if(Math.abs(dx)<70&&Math.abs(dy)<50){
+      S3.boardDone=true; S3.boardPos={x:0,y:0};
+      log("Этап 5.3: плата уложена"); showTip("✓ Плата уложена",2000); draw3DStage();
+      setTimeout(function(){s3_setStep(4);s3_initScrews();},900);
+    } else if(dx<-200) showTip("✗ Разъёмы должны быть справа",2000);
+  }
+  function s3_initScrews(){ S3.screwUser=[]; S3.screwState={}; $("s3_screwsDone").textContent="0"; $("s3_orderStatus").textContent="—"; $("btnStage3").disabled=true; draw3DStage(); }
   function s3_tightenScrew(id){
-    if (S3.screwState[id]) return;
-    S3.screwState[id] = true;
-    S3.screwUser.push(id);
-    $("s3_screwsDone").textContent = S3.screwUser.length;
-    var soFar = true;
-    for (var i=0;i<S3.screwUser.length;i++){
-      if (S3.screwUser[i] !== S3.screwOrder[i]){ soFar = false; break; }
+    if(S3.screwState[id]) return;
+    S3.screwState[id]=true; S3.screwUser.push(id); $("s3_screwsDone").textContent=S3.screwUser.length;
+    var soFar=true;
+    for(var i=0;i<S3.screwUser.length;i++) if(S3.screwUser[i]!==SCREW_ORDER[i]){soFar=false;break;}
+    $("s3_orderStatus").textContent=soFar?"верный ✓":"нарушен ✗";
+    $("s3_orderStatus").style.color=soFar?"#2ecc71":"#e74c3c";
+    if(S3.screwUser.length===9) $("btnStage3").disabled=false;
+    log("Этап 5.4: винт "+id); s3_renderLeft(); draw3DStage();
+  }
+  $("btnStage3").addEventListener("click",function(){
+    var orderOk=true;
+    for(var i=0;i<S3.screwUser.length;i++) if(S3.screwUser[i]!==SCREW_ORDER[i]){orderOk=false;break;}
+    var score=0;
+    if(S3.ioDone) score+=2;
+    if(S3.standsDone) score+=4;
+    if(S3.boardDone) score+=2;
+    if(S3.screwUser.length===9&&orderOk) score+=2;
+    S.stage3.score=Math.min(10,score); S.stage3.status="сдано";
+    log("Этап 5: "+S.stage3.score+"/10"); showTip("Этап 5: "+S.stage3.score+"/10",2000);
+    refreshStageNav(); goToStage(6);
+  });
+  function draw3DStage(){
+    var ctx=S3.ctx,W=S3.canvasW,H=S3.canvasH;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0a0f15"; ctx.fillRect(0,0,W,H);
+    var project=s3_projectFactory();
+    var standCorners=[[-280,-200],[280,-200],[280,200],[-280,200]];
+    ctx.beginPath();
+    for(var i=0;i<4;i++){var p=project(standCorners[i][0],standCorners[i][1],0);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);}
+    ctx.closePath(); ctx.fillStyle="#161d2a"; ctx.fill(); ctx.strokeStyle="#55637a"; ctx.lineWidth=2; ctx.stroke();
+    function edge(x1,y1,z1,x2,y2,z2){var a=project(x1,y1,z1),b=project(x2,y2,z2);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle="#3a4455";ctx.lineWidth=3;ctx.stroke();}
+    edge(-280,-200,0,-280,-200,200); edge(280,-200,0,280,-200,200);
+    edge(280,200,0,280,200,200); edge(-280,200,0,-280,200,200);
+    var ioP1=project(280,-30,60),ioP2=project(280,-30,160),ioP3=project(280,30,160),ioP4=project(280,30,60);
+    ctx.beginPath(); ctx.moveTo(ioP1.x,ioP1.y); ctx.lineTo(ioP2.x,ioP2.y); ctx.lineTo(ioP3.x,ioP3.y); ctx.lineTo(ioP4.x,ioP4.y); ctx.closePath();
+    ctx.fillStyle=S3.ioDone?"#1e8a4c":"#0a0e14"; ctx.fill();
+    ctx.strokeStyle=S3.ioDone?"#2ecc71":"#55637a"; ctx.lineWidth=2; ctx.stroke();
+    for(var r=0;r<4;r++) for(var col=0;col<4;col++){
+      var id=String.fromCharCode(65+r)+(col+1);
+      var lx=-200+col*200,ly=-140+r*140;
+      var hp=project(lx,ly,1);
+      var isActive=!!S3.activeStands[id];
+      var isHover=(S3.hoverHole===id);
+      ctx.beginPath(); ctx.arc(hp.x,hp.y,isHover?12:9,0,Math.PI*2);
+      ctx.fillStyle=isActive?"#2ecc71":(isHover?"#3d8bff":"#0a0e14"); ctx.fill();
+      ctx.strokeStyle=isActive?"#1e8a4c":"#55637a"; ctx.lineWidth=2; ctx.stroke();
+      if(isActive){
+        var top=project(lx,ly,14);
+        ctx.beginPath(); ctx.moveTo(hp.x,hp.y); ctx.lineTo(top.x,top.y); ctx.strokeStyle="#6b7280"; ctx.lineWidth=3; ctx.stroke();
+        ctx.beginPath(); ctx.arc(top.x,top.y,8,0,Math.PI*2); ctx.fillStyle="#8b939f"; ctx.fill(); ctx.strokeStyle="#2a2f38"; ctx.stroke();
+      }
     }
-    $("s3_orderStatus").textContent = soFar ? "верный ✓" : "нарушен ✗";
-    $("s3_orderStatus").style.color = soFar ? "#2ecc71" : "#e74c3c";
-    if (S3.screwUser.length === 9) $("btnStage3").disabled = false;
-    log("Этап 3.4: винт " + id + " (" + S3.screwUser.length + "/9)");
-    s3_renderLeft();
-    draw3DStage();
+    if(S3.step>=3) drawBoard3D(project,S3.boardPos.x,S3.boardPos.y,S3.boardDone?15:40);
+    if(S3.step===4){
+      for(var si=0;si<CORRECT_STANDS.length;si++){
+        var sid=CORRECT_STANDS[si]; var sp=s3_standLocalPos(sid);
+        var isTight=!!S3.screwState[sid];
+        var p2=project(sp.x,sp.y,isTight?22:26);
+        ctx.beginPath(); ctx.arc(p2.x,p2.y,9,0,Math.PI*2);
+        ctx.fillStyle=isTight?"#2ecc71":"#cfd6df"; ctx.fill();
+        ctx.strokeStyle="#2a2f38"; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle="#111"; ctx.font="bold 9px Segoe UI"; ctx.textAlign="center";
+        ctx.fillText(sid,p2.x,p2.y+3);
+      }
+    }
+  }
+  function drawBoard3D(project,bx,by,bz){
+    var ctx=S3.ctx,w=400,h=280;
+    var corners=[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]];
+    for(var i=0;i<4;i++){
+      var a=corners[i],b=corners[(i+1)%4];
+      var pa=project(bx+a[0],by+a[1],bz),pb=project(bx+b[0],by+b[1],bz);
+      var pa0=project(bx+a[0],by+a[1],0),pb0=project(bx+b[0],by+b[1],0);
+      ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.lineTo(pb0.x,pb0.y); ctx.lineTo(pa0.x,pa0.y); ctx.closePath();
+      ctx.fillStyle="#0a1a10"; ctx.fill();
+    }
+    ctx.beginPath();
+    for(var j=0;j<4;j++){var pj=project(bx+corners[j][0],by+corners[j][1],bz);if(j===0)ctx.moveTo(pj.x,pj.y);else ctx.lineTo(pj.x,pj.y);}
+    ctx.closePath(); ctx.fillStyle="#14361f"; ctx.fill(); ctx.strokeStyle="#2ecc71"; ctx.lineWidth=2; ctx.stroke();
+    var sc=project(bx-100,by,bz+2); ctx.fillStyle="#1a3a55"; ctx.fillRect(sc.x-30,sc.y-25,60,50); ctx.strokeStyle="#3d8bff"; ctx.strokeRect(sc.x-30,sc.y-25,60,50);
+    for(var rr=0;rr<2;rr++){ var rm=project(bx+80,by-30+rr*30,bz+2); ctx.fillStyle="#1e3a55"; ctx.fillRect(rm.x-15,rm.y-8,30,16); ctx.strokeStyle="#4dd0e1"; ctx.strokeRect(rm.x-15,rm.y-8,30,16); }
+    var ch=project(bx+60,by+70,bz+2); ctx.fillStyle="#1a1e2e"; ctx.fillRect(ch.x-25,ch.y-15,50,30); ctx.strokeStyle="#3d8bff"; ctx.strokeRect(ch.x-25,ch.y-15,50,30);
   }
 
-  $("btnStage3").addEventListener("click", function(){
-    var orderOk = true;
-    for (var i=0;i<S3.screwUser.length;i++){
-      if (S3.screwUser[i] !== S3.screwOrder[i]){ orderOk = false; break; }
-    }
-    var score = 0;
-    if (S3.ioDone) score += 3;
-    if (S3.standsDone) score += 4;
-    if (S3.boardDone) score += 3;
-    if (S3.screwUser.length === 9 && orderOk) score += 5;
-    S.stage3.score = score;
-    S.stage3.status = "сдано";
-    log("Этап 3: балл " + score + "/15");
-    showTip("Этап 3: " + score + "/15", 2000);
-    refreshStageNav();
-    goToStage(4);
-  });
+  /* ============ ЭТАП 6: ПОДКЛЮЧЕНИЕ КАБЕЛЕЙ ============ */
+  var S3B={canvas:null,ctx:null,step:1,connected:{},foundErrors:{},canvasW:900,canvasH:620,errors:{},dragCable:null,dragX:0,dragY:0,hoverSocket:null};
+  S3B.errors={
+    err_eps_in_pcie:{label:"8-pin EPS воткнут в PCIe"},
+    err_hdd_led_rev:{label:"HDD LED с обратной полярностью"},
+    err_atx_loose:{label:"24-pin ATX не до конца"},
+    err_pwr_on_rst:{label:"Power SW подключён к Reset"},
+    err_usb3_in_usb2:{label:"USB 3.0 в разъёме USB 2.0"}
+  };
+  var S3B_STEPS={
+    1:{hint:"Перетащите кабели питания на разъёмы.",
+      sockets:[
+        {id:"s_atx24",x:820,y:200,w:60,h:120,color:"#f0c040",label:"24-pin ATX"},
+        {id:"s_eps8",x:400,y:60,w:100,h:36,color:"#e74c3c",label:"8-pin EPS"},
+        {id:"s_pcie",x:300,y:480,w:160,h:36,color:"#333",label:"PCIe 6+2"},
+        {id:"s_sata",x:820,y:500,w:80,h:50,color:"#f39c12",label:"SATA power"}
+      ],
+      cables:[
+        {id:"c_atx24",info:"24-pin ATX — основное питание",compat:["s_atx24"],pins:"24"},
+        {id:"c_eps8",info:"8-pin EPS — питание CPU",compat:["s_eps8"],pins:"8"},
+        {id:"c_pcie",info:"6+2-pin PCIe — питание GPU",compat:["s_pcie"],pins:"8"},
+        {id:"c_sata",info:"SATA power — питание накопителя",compat:["s_sata"],pins:"15"}
+      ]},
+    2:{hint:"Перетащите коннекторы корпуса на F_PANEL. LED требуют полярности.",
+      sockets:[
+        {id:"s_pwrsw",x:600,y:560,w:30,h:22,color:"#2ecc71",label:"Power SW"},
+        {id:"s_rstsw",x:640,y:560,w:30,h:22,color:"#3d8bff",label:"Reset SW"},
+        {id:"s_hddled",x:680,y:560,w:30,h:22,color:"#ff5c8a",label:"HDD LED"},
+        {id:"s_pled",x:720,y:560,w:30,h:22,color:"#4dd0e1",label:"Power LED"},
+        {id:"s_spk",x:760,y:560,w:30,h:22,color:"#f39c12",label:"Speaker"}
+      ],
+      cables:[
+        {id:"c_pwrsw",info:"Power SW — кнопка включения",compat:["s_pwrsw"],pins:"2",polar:false},
+        {id:"c_rstsw",info:"Reset SW — кнопка перезагрузки",compat:["s_rstsw"],pins:"2",polar:false},
+        {id:"c_hddled",info:"HDD LED — индикатор диска",compat:["s_hddled"],pins:"2",polar:true},
+        {id:"c_pled",info:"Power LED — индикатор питания",compat:["s_pled"],pins:"2",polar:true},
+        {id:"c_spk",info:"Speaker — динамик BIOS",compat:["s_spk"],pins:"4",polar:false}
+      ]},
+    3:{hint:"Перетащите USB, Audio и Type-C на разъёмы.",
+      sockets:[
+        {id:"s_usb3",x:600,y:530,w:60,h:16,color:"#3d8bff",label:"F_USB3"},
+        {id:"s_usb2",x:500,y:530,w:50,h:16,color:"#333",label:"F_USB"},
+        {id:"s_audio",x:300,y:530,w:50,h:16,color:"#f39c12",label:"F_AUDIO"},
+        {id:"s_typec",x:700,y:530,w:40,h:16,color:"#9b59b6",label:"F_U32C"}
+      ],
+      cables:[
+        {id:"c_usb3",info:"USB 3.0 — 20 пинов",compat:["s_usb3"],pins:"20"},
+        {id:"c_usb2",info:"USB 2.0 — 9 пинов",compat:["s_usb2"],pins:"9"},
+        {id:"c_audio",info:"HD Audio — 9 пинов",compat:["s_audio"],pins:"9"},
+        {id:"c_typec",info:"USB Type-C — 24 пина",compat:["s_typec"],pins:"24"}
+      ]},
+    4:{hint:"Найдите 5 ошибок в подключениях.",
+      sockets:[
+        {id:"err_eps_in_pcie",x:300,y:480,w:160,h:36,color:"#5a1e1e",label:""},
+        {id:"err_hdd_led_rev",x:660,y:560,w:30,h:22,color:"#5a1e1e",label:""},
+        {id:"err_atx_loose",x:820,y:200,w:60,h:120,color:"#5a1e1e",label:""},
+        {id:"err_pwr_on_rst",x:720,y:560,w:30,h:22,color:"#5a1e1e",label:""},
+        {id:"err_usb3_in_usb2",x:500,y:530,w:50,h:16,color:"#5a1e1e",label:""}
+      ],cables:[]}
+  };
 
-  /* ---------- 3D-рендер этапа 3 ---------- */
-  function draw3DStage(){
-    var ctx = S3.ctx, W = S3.canvas.width, H = S3.canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#0a0f15"; ctx.fillRect(0,0,W,H);
+  function s3b_mouse(e){var rect=S3B.canvas.getBoundingClientRect();return{x:(e.clientX-rect.left)*(S3B.canvasW/rect.width),y:(e.clientY-rect.top)*(S3B.canvasH/rect.height)};}
+  function s3b_findSocket(id){for(var i=0;i<S3B.sockets.length;i++) if(S3B.sockets[i].id===id) return S3B.sockets[i];return null;}
+  function s3b_findSocketAt(x,y){for(var i=0;i<S3B.sockets.length;i++){var sc=S3B.sockets[i];if(x>=sc.x&&x<=sc.x+sc.w&&y>=sc.y&&y<=sc.y+sc.h) return sc;}return null;}
 
-    var cx = W/2, cy = H/2 + 40;
-    var cosA = Math.cos(S3.angle), sinA = Math.sin(S3.angle);
-    function project(x, y, z){
-      var xr = x*cosA - y*sinA, yr = x*sinA + y*cosA;
-      return { x: cx + xr + yr*0.35, y: cy + yr*0.65 - z };
-    }
-
-    // поддон
-    var standCorners = [[-280,-200],[280,-200],[280,200],[-280,200]];
-    ctx.beginPath();
-    for (var i=0;i<4;i++){ var p = project(standCorners[i][0], standCorners[i][1], 0); if (i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); }
-    ctx.closePath();
-    ctx.fillStyle = "#161d2a"; ctx.fill();
-    ctx.strokeStyle = "#55637a"; ctx.lineWidth = 2; ctx.stroke();
-
-    // стенки корпуса (тонкие рёбра)
-    function edge(x1,y1,z1, x2,y2,z2){
-      var a = project(x1,y1,z1), b = project(x2,y2,z2);
-      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-      ctx.strokeStyle = "#3a4455"; ctx.lineWidth = 3; ctx.stroke();
-    }
-    edge(-280,-200,0, -280,-200,200); edge(280,-200,0, 280,-200,200);
-    edge(280,200,0, 280,200,200);     edge(-280,200,0, -280,200,200);
-    edge(-280,-200,200, 280,-200,200);
-    edge(280,-200,200, 280,200,200);
-    edge(280,200,200, -280,200,200);
-    edge(-280,200,200, -280,-200,200);
-
-    // I/O окно на задней стенке (при z=100, x=280)
-    var ioP1 = project(280, -30, 60), ioP2 = project(280, -30, 160), ioP3 = project(280, 30, 160), ioP4 = project(280, 30, 60);
-    ctx.beginPath();
-    ctx.moveTo(ioP1.x,ioP1.y); ctx.lineTo(ioP2.x,ioP2.y); ctx.lineTo(ioP3.x,ioP3.y); ctx.lineTo(ioP4.x,ioP4.y); ctx.closePath();
-    ctx.fillStyle = S3.ioDone ? "#1e8a4c" : "#0a0e14";
-    ctx.fill();
-    ctx.strokeStyle = S3.ioDone ? "#2ecc71" : "#55637a";
-    ctx.lineWidth = 2; ctx.stroke();
-    if (S3.ioDone){
-      var c = project(280, 0, 110);
-      ctx.fillStyle = "#fff"; ctx.font = "bold 12px Segoe UI"; ctx.textAlign = "center";
-      ctx.fillText("I/O", c.x, c.y + 4);
-    }
-
-    // отверстия 16 штук (шаг 200 по x, 140 по y => 4x4)
-    for (var r=0;r<4;r++){
-      for (var col=0;col<4;col++){
-        var id = String.fromCharCode(65+r) + (col+1);
-        var lx = -200 + col * 200;
-        var ly = -140 + r * 140;
-        var hp = project(lx, ly, 1);
-        var isActive = !!S3.activeStands[id];
-        var isHover = (S3.hoverHole === id);
-        ctx.beginPath();
-        ctx.arc(hp.x, hp.y, isHover ? 12 : 9, 0, Math.PI*2);
-        ctx.fillStyle = isActive ? "#2ecc71" : (isHover ? "#3d8bff" : "#0a0e14");
-        ctx.fill();
-        ctx.strokeStyle = isActive ? "#1e8a4c" : "#55637a";
-        ctx.lineWidth = 2; ctx.stroke();
-
-        // стойка (если активна)
-        if (isActive){
-          var top = project(lx, ly, 14);
-          ctx.beginPath();
-          ctx.arc(top.x, top.y, 8, 0, Math.PI*2);
-          ctx.fillStyle = "#8b939f"; ctx.fill();
-          ctx.strokeStyle = "#2a2f38"; ctx.stroke();
-          // боковая линия стойки
-          ctx.beginPath(); ctx.moveTo(hp.x, hp.y); ctx.lineTo(top.x, top.y);
-          ctx.strokeStyle = "#6b7280"; ctx.lineWidth = 3; ctx.stroke();
+  function initStage3b(){
+    S3B.canvas=$("s3bCanvas"); S3B.ctx=S3B.canvas.getContext("2d");
+    S3B.connected={}; S3B.foundErrors={}; S3B.step=1; S3B.dragCable=null;
+    s3b_setStep(1);
+    S3B.canvas.addEventListener("click",function(e){
+      var pos=s3b_mouse(e);
+      if(S3B.step===4){
+        for(var k in S3B.errors){
+          if(S3B.errors.hasOwnProperty(k)&&!S3B.foundErrors[k]){
+            var sc=s3b_findSocket(k);
+            if(sc&&pos.x>=sc.x&&pos.x<=sc.x+sc.w&&pos.y>=sc.y&&pos.y<=sc.y+sc.h){ s3b_markError(k); return; }
+          }
         }
       }
+    });
+    S3B.canvas.addEventListener("mousemove",function(e){
+      var pos=s3b_mouse(e);
+      S3B.hoverSocket=s3b_findSocketAt(pos.x,pos.y);
+      if(S3B.dragCable){ S3B.dragX=pos.x; S3B.dragY=pos.y; }
+      s3b_render();
+    });
+    window.addEventListener("mouseup",function(e){
+      if(!S3B.dragCable) return;
+      var rect=S3B.canvas.getBoundingClientRect();
+      if(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom){
+        S3B.dragCable=null; s3b_render(); s3b_renderCables(); return;
+      }
+      var mx=(e.clientX-rect.left)*(S3B.canvasW/rect.width);
+      var my=(e.clientY-rect.top)*(S3B.canvasH/rect.height);
+      var cableId=S3B.dragCable;
+      var c=null;
+      for(var ci=0;ci<S3B.cables.length;ci++) if(S3B.cables[ci].id===cableId) c=S3B.cables[ci];
+      S3B.dragCable=null;
+      if(!c){ s3b_render(); return; }
+      var hit=s3b_findSocketAt(mx,my);
+      if(!hit){ s3b_render(); s3b_renderCables(); return; }
+      if(c.compat.indexOf(hit.id)!==-1){
+        S3B.connected[c.id]=true;
+        $("s3bConnected").textContent=Object.keys(S3B.connected).length;
+        $("s3bHint").textContent="✓ Кабель подключён";
+        showTip("✓ Подключено",1200);
+        s3b_renderCables(); s3b_render();
+        var step1Done=S3B.connected["c_atx24"]&&S3B.connected["c_eps8"]&&S3B.connected["c_pcie"]&&S3B.connected["c_sata"];
+        var step2Done=step1Done&&S3B.connected["c_pwrsw"]&&S3B.connected["c_rstsw"]&&S3B.connected["c_hddled"]&&S3B.connected["c_pled"]&&S3B.connected["c_spk"];
+        var step3Done=step2Done&&S3B.connected["c_usb3"]&&S3B.connected["c_usb2"]&&S3B.connected["c_audio"]&&S3B.connected["c_typec"];
+        if(S3B.step===1&&step1Done){ setTimeout(function(){s3b_setStep(2);showTip("Переходим к F_PANEL",1500);},800); }
+        else if(S3B.step===2&&step2Done){ setTimeout(function(){s3b_setStep(3);showTip("Переходим к USB/Audio",1500);},800); }
+        else if(S3B.step===3&&step3Done){ setTimeout(function(){s3b_setStep(4);showTip("Осталось найти ошибки",1500);},800); }
+      } else {
+        $("s3bHint").textContent="✗ Не подходит";
+        showTip("✗ Не подходит к этому разъёму",1500);
+        s3b_render(); s3b_renderCables();
+      }
+    });
+  }
+  function s3b_setStep(n){
+    S3B.step=n;
+    var tabs=["s3bTab1","s3bTab2","s3bTab3","s3bTab4"];
+    for(var i=0;i<4;i++) $(tabs[i]).className="tabBtn"+(i===n-1?" active":"");
+    S3B.sockets=S3B_STEPS[n].sockets; S3B.cables=S3B_STEPS[n].cables;
+    S3B.total=(n===4)?5:S3B.cables.length;
+    $("s3bTotal").textContent=S3B.total;
+    var cur=(n===4)?Object.keys(S3B.foundErrors).length:Object.keys(S3B.connected).length;
+    $("s3bConnected").textContent=cur;
+    $("s3bHint").textContent=S3B_STEPS[n].hint;
+    $("btnStage3b").disabled=true;
+    S3B.dragCable=null; S3B.hoverSocket=null;
+    s3b_renderCables(); s3b_render();
+  }
+  function s3b_renderCables(){
+    var panel=$("s3bCablePanel"); panel.innerHTML="";
+    if(S3B.step===4){
+      panel.innerHTML="<p><b>Найденные ошибки:</b></p>";
+      for(var k in S3B.errors){
+        if(S3B.errors.hasOwnProperty(k)){
+          (function(key){
+            var el=document.createElement("div");
+            el.className="errBtn"+(S3B.foundErrors[key]?" found":"");
+            el.textContent=(S3B.foundErrors[key]?"✓ ":"• ")+S3B.errors[key].label;
+            if(!S3B.foundErrors[key]) el.addEventListener("click",function(){s3b_markError(key);});
+            panel.appendChild(el);
+          })(k);
+        }
+      }
+      return;
     }
-
-    // плата (вне или внутри, в зависимости от шага)
-    if (S3.step >= 3){
-      var bx = S3.boardPos.x, by = S3.boardPos.y;
-      var bz = S3.boardDone ? 15 : 40;
-      drawBoard3D(project, bx, by, bz);
+    for(var i=0;i<S3B.cables.length;i++){
+      (function(c){
+        var el=document.createElement("div");
+        el.className="cableItem"+(S3B.connected[c.id]?" done":"");
+        el.innerHTML="<div class='cName'>"+c.info+"</div>";
+        var cv=document.createElement("canvas"); cv.width=260; cv.height=46;
+        cv.style.width="100%"; cv.style.height="46px";
+        el.appendChild(cv);
+        s3b_drawCablePins(cv.getContext("2d"),c.pins,c.polar);
+        el.addEventListener("mousedown",function(e){
+          if(S3B.connected[c.id]) return;
+          S3B.dragCable=c.id;
+          S3B.dragX=S3B.canvasW/2; S3B.dragY=S3B.canvasH/2;
+          var items=panel.querySelectorAll(".cableItem");
+          for(var j=0;j<items.length;j++) items[j].className="cableItem"+(items[j].className.indexOf("done")!==-1?" done":"");
+          el.className="cableItem active";
+          $("s3bHint").textContent="Тяните кабель на плату.";
+          s3b_render();
+          e.preventDefault();
+        });
+        panel.appendChild(el);
+      })(S3B.cables[i]);
     }
+  }
+  function s3b_drawCablePins(ctx,pinType,polar){
+    ctx.clearRect(0,0,260,46);
+    var pinCol="#f0c040";
+    if(pinType==="24"){for(var r=0;r<2;r++) for(var i=0;i<12;i++){ctx.beginPath();ctx.arc(15+i*19,12+r*20,5,0,Math.PI*2);ctx.fillStyle=pinCol;ctx.fill();ctx.strokeStyle="#7a5c00";ctx.stroke();}}
+    else if(pinType==="8"){for(var r2=0;r2<2;r2++) for(var i2=0;i2<4;i2++){ctx.beginPath();ctx.arc(60+i2*26,12+r2*20,7,0,Math.PI*2);ctx.fillStyle=pinCol;ctx.fill();ctx.strokeStyle="#7a5c00";ctx.stroke();}}
+    else if(pinType==="15"){for(var i3=0;i3<15;i3++){ctx.fillStyle=pinCol;ctx.fillRect(20+i3*14,14,8,18);ctx.strokeStyle="#7a5c00";ctx.strokeRect(20+i3*14,14,8,18);}}
+    else if(pinType==="20"){for(var r4=0;r4<2;r4++) for(var i4=0;i4<10;i4++){ctx.beginPath();ctx.arc(20+i4*22,12+r4*20,6,0,Math.PI*2);ctx.fillStyle=pinCol;ctx.fill();ctx.strokeStyle="#7a5c00";ctx.stroke();}}
+    else if(pinType==="9"){for(var r5=0;r5<2;r5++){var cols=r5===0?5:4;for(var i5=0;i5<cols;i5++){ctx.beginPath();ctx.arc(80+i5*26,12+r5*20,7,0,Math.PI*2);ctx.fillStyle=pinCol;ctx.fill();ctx.strokeStyle="#7a5c00";ctx.stroke();}}}
+    else if(pinType==="2"||pinType==="4"){var cnt=parseInt(pinType,10);for(var i7=0;i7<cnt;i7++){ctx.beginPath();ctx.arc(110+i7*18,23,6,0,Math.PI*2);ctx.fillStyle=polar?(i7===0?"#ff5c8a":"#333"):pinCol;ctx.fill();ctx.strokeStyle="#7a5c00";ctx.stroke();}}
+    else {ctx.fillStyle=pinCol;ctx.fillRect(30,18,200,10);}
+  }
+  function s3b_render(){
+    var ctx=S3B.ctx,W=S3B.canvasW,H=S3B.canvasH;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0a0f15"; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="#0d2615"; ctx.fillRect(20,20,W-40,H-40);
+    ctx.strokeStyle="#2ecc71"; ctx.lineWidth=2; ctx.strokeRect(20,20,W-40,H-40);
+    ctx.fillStyle="#1a3a55"; ctx.fillRect(280,180,180,180);
+    ctx.strokeStyle="#3d8bff"; ctx.strokeRect(280,180,180,180);
+    ctx.fillStyle="#1e3a55"; for(var i=0;i<4;i++) ctx.fillRect(520+i*30,130,22,240);
+    ctx.strokeStyle="#4dd0e1"; for(var i2=0;i2<4;i2++) ctx.strokeRect(520+i2*30,130,22,240);
+    ctx.fillStyle="#1a1e2e"; ctx.fillRect(600,430,140,100); ctx.strokeStyle="#3d8bff"; ctx.strokeRect(600,430,140,100);
+    ctx.fillStyle="#2a2f38"; ctx.fillRect(100,470,360,30); ctx.strokeStyle="#f0c040"; ctx.strokeRect(100,470,360,30);
+    ctx.fillStyle="#1e1e2a"; ctx.fillRect(100,380,200,20); ctx.strokeStyle="#9b59b6"; ctx.strokeRect(100,380,200,20);
+    ctx.fillStyle="#2a2f38"; for(var s=0;s<4;s++) ctx.fillRect(820,400+s*22,40,18);
+    ctx.strokeStyle="#f39c12"; for(var s2=0;s2<4;s2++) ctx.strokeRect(820,400+s2*22,40,18);
+    ctx.fillStyle="#1a2331"; ctx.fillRect(W-70,20,50,H-40); ctx.strokeStyle="#55637a"; ctx.strokeRect(W-70,20,50,H-40);
 
-    // винты (шаг 4)
-    if (S3.step === 4){
-      for (var si=0; si<S3.correctStands.length; si++){
-        var sid = S3.correctStands[si];
-        var sp = s3_standLocalPos(sid);
-        var isTight = !!S3.screwState[sid];
-        var topZ = isTight ? 22 : 26;
-        var p1 = project(sp.x, sp.y, topZ);
-        var col2 = isTight ? "#2ecc71" : "#cfd6df";
-        ctx.beginPath(); ctx.arc(p1.x, p1.y, 9, 0, Math.PI*2);
-        ctx.fillStyle = col2; ctx.fill();
-        ctx.strokeStyle = "#2a2f38"; ctx.lineWidth = 2; ctx.stroke();
-        // номер
-        ctx.fillStyle = "#111"; ctx.font = "bold 9px Segoe UI"; ctx.textAlign = "center";
-        ctx.fillText(sid, p1.x, p1.y + 3);
+    var highlightIds={};
+    if(S3B.dragCable){
+      var activeCable=null;
+      for(var ci=0;ci<S3B.cables.length;ci++) if(S3B.cables[ci].id===S3B.dragCable) activeCable=S3B.cables[ci];
+      if(activeCable) for(var cj=0;cj<activeCable.compat.length;cj++) highlightIds[activeCable.compat[cj]]=true;
+    }
+    for(var k=0;k<S3B.sockets.length;k++){
+      var sc=S3B.sockets[k];
+      var isConnected=(S3B.step!==4)&&!!S3B.connected[sc.id];
+      var isFoundErr=(S3B.step===4)&&S3B.foundErrors[sc.id];
+      var isErrHighlight=(S3B.step===4)&&S3B.errors[sc.id]&&!S3B.foundErrors[sc.id];
+      var isHighlighted=!!highlightIds[sc.id];
+      var isHover=(S3B.hoverSocket&&S3B.hoverSocket.id===sc.id);
+      ctx.fillStyle=isFoundErr?"#1e8a4c":(isConnected?"#1e8a4c":(isHighlighted?"#2ecc71":sc.color));
+      ctx.fillRect(sc.x,sc.y,sc.w,sc.h);
+      ctx.strokeStyle=isErrHighlight?"#ff5c8a":(isConnected||isFoundErr||isHighlighted?"#2ecc71":(isHover?"#8fd0ff":"#8899b0"));
+      ctx.lineWidth=(isErrHighlight||isHighlighted||isHover)?3:2;
+      ctx.strokeRect(sc.x,sc.y,sc.w,sc.h);
+      if(sc.label && S3B.step!==4){
+        ctx.fillStyle="#111"; ctx.font="bold 9px Segoe UI"; ctx.textAlign="center";
+        ctx.fillText(sc.label, sc.x+sc.w/2, sc.y+sc.h/2+3);
+      }
+    }
+    if(S3B.hoverSocket && S3B.hoverSocket.label){
+      var hs=S3B.hoverSocket;
+      var tx=hs.x+hs.w/2, ty=hs.y-12;
+      ctx.font="bold 12px Segoe UI";
+      var tw=ctx.measureText(hs.label).width+16;
+      ctx.fillStyle="rgba(0,0,0,0.85)";
+      ctx.fillRect(tx-tw/2, ty-16, tw, 22);
+      ctx.strokeStyle="#8fd0ff"; ctx.lineWidth=1;
+      ctx.strokeRect(tx-tw/2, ty-16, tw, 22);
+      ctx.fillStyle="#8fd0ff"; ctx.textAlign="center";
+      ctx.fillText(hs.label, tx, ty);
+    }
+    if(S3B.dragCable){
+      ctx.save(); ctx.globalAlpha=0.85; ctx.fillStyle="#f0c040";
+      ctx.fillRect(S3B.dragX-30,S3B.dragY-10,60,20);
+      ctx.strokeStyle="#7a5c00"; ctx.lineWidth=2;
+      ctx.strokeRect(S3B.dragX-30,S3B.dragY-10,60,20);
+      ctx.restore();
+    }
+  }
+  function s3b_markError(id){
+    if(S3B.foundErrors[id]) return;
+    S3B.foundErrors[id]=true;
+    $("s3bConnected").textContent=Object.keys(S3B.foundErrors).length;
+    $("s3bHint").textContent="✓ Найдена ошибка";
+    if(Object.keys(S3B.foundErrors).length===5){ $("btnStage3b").disabled=false; showTip("✓ Все 5 ошибок!",2500); }
+    s3b_renderCables(); s3b_render();
+  }
+  $("s3bTab1").addEventListener("click",function(){s3b_setStep(1);});
+  $("s3bTab2").addEventListener("click",function(){s3b_setStep(2);});
+  $("s3bTab3").addEventListener("click",function(){s3b_setStep(3);});
+  $("s3bTab4").addEventListener("click",function(){s3b_setStep(4);});
+  $("btnStage3b").addEventListener("click",function(){
+    var c=Object.keys(S3B.connected).length;
+    var e=Object.keys(S3B.foundErrors).length;
+    var score=Math.round((c+e)*15/18);
+    if(score>15) score=15;
+    S.stage3b.score=score; S.stage3b.status="сдано";
+    log("Этап 6: "+score+"/15"); showTip("Этап 6: "+score+"/15",2500);
+    refreshStageNav(); goToStage(7);
+  });
+
+  /* ============ ЭТАП 7: СИГНАЛЫ ============ */
+  var SIG={
+    step:1,totalSteps:6,canvas:null,ctx:null,canvasW:700,canvasH:640,score:0,
+    activeNodes:{},activeLines:[],pulse:{t:0,active:false,from:null,to:null,color:"#3d8bff"},
+    questionAnswered:false
+  };
+  var SIG_STEPS=[
+    {title:"Шаг 1. Нажатие кнопки Power",
+     theory:"<h3>Физика процесса</h3><p>На колодке <b>F_PANEL</b> два контакта <b>Power SW</b>. Нажатие замыкает их — проходит слабый ток.</p><p>Это не «включение питания», а <b>сигнал</b> для чипсета.</p><h3>Важно</h3><ul><li>Кнопка не коммутирует силовые линии БП.</li><li>Если Power SW не подключён — ПК не включится.</li></ul>",
+     hint:"Кликните по кнопке Power на схеме.",
+     question:"Что произойдёт, если контакты Power SW не подключены к F_PANEL?",
+     qKeys:["не включ","не запуст","не сработ","сигнал не","нет сигнал"],
+     qFull:"ПК не включится: сигнал на чипсет не поступит."},
+    {title:"Шаг 2. Чипсет → БП",
+     theory:"<h3>Обработка</h3><p>Чипсет проверяет дежурное питание <b>+5VSB</b> и замыкает линию <b>PS_ON</b> на блоке питания.</p><p><b>PS_ON</b> — команда БП выйти из режима ожидания.</p><h3>Порядок</h3><ul><li>Проверка +5VSB.</li><li>Замыкание PS_ON.</li><li>Питание на компоненты пока НЕ подаётся.</li></ul>",
+     hint:"Кликните по чипсету, затем по блоку питания.",
+     question:"Как называется сигнал, которым чипсет включает блок питания?",
+     qKeys:["ps_on","ps-on","ps on","псон"],
+     qFull:"Сигнал PS_ON (Power Supply On)."},
+    {title:"Шаг 3. БП подаёт напряжения",
+     theory:"<h3>Три напряжения</h3><ul><li><b>+3.3V</b> — чипсет, логика.</li><li><b>+5V</b> — USB, часть контроллеров.</li><li><b>+12V</b> — процессор (через VRM) и видеокарта.</li></ul><p>Питание приходит через <b>24-pin</b>, а на CPU — через <b>8-pin EPS</b>.</p><h3>Если 8-pin не подключён</h3><p>Плата включится, вентиляторы закрутятся, но <b>изображения не будет</b>.</p>",
+     hint:"Расставьте напряжения на правильные шины.",
+     question:"Какое напряжение используется для питания процессора (через VRM)?",
+     qKeys:["12","12v","+12"],
+     qFull:"+12V — идёт на VRM."},
+    {title:"Шаг 4. CPU запускает BIOS и POST",
+     theory:"<h3>Старт процессора</h3><p>CPU сбрасывает регистры и переходит на адрес BIOS/UEFI.</p><p>Запускается <b>POST</b> — быстрая проверка CPU, RAM, видеокарты, клавиатуры.</p><h3>Если что-то не так</h3><ul><li>Нет RAM — POST останавливается.</li><li>Нет видео — нет изображения.</li></ul>",
+     hint:"Нажмите «Запустить POST».",
+     question:"Что проверяет POST в первую очередь?",
+     qKeys:["процессор","ram","памят","оператив","видео","cpu"],
+     qFull:"POST проверяет CPU, RAM, видеокарту."},
+    {title:"Шаг 5. Поиск загрузчика",
+     theory:"<h3>После POST</h3><p>BIOS перебирает устройства: SATA, USB, NVMe, сеть. Ищет <b>загрузочный сектор</b>.</p><p>Первый найденный — становится загрузочным.</p><h3>Если нигде нет</h3><p>«No boot device» — ОС не загрузится.</p>",
+     hint:"Выберите устройство с ОС.",
+     question:"Что ищет BIOS на каждом устройстве?",
+     qKeys:["загрузочн","boot","загрузчик","сектор"],
+     qFull:"Загрузочный сектор (boot sector)."},
+    {title:"Шаг 6. Передача управления ОС",
+     theory:"<h3>Дальше</h3><p>BIOS передаёт управление загрузчику ОС.</p><h3>Как идут сигналы от мыши</h3><p>Мышь/клавиатура → USB → чипсет → CPU → RAM → GPU → монитор.</p><p>Видеокарта с CPU общается <b>напрямую</b> по PCIe.</p><h3>Итог</h3><p>Каждое действие — цепочка сигналов через узлы платы.</p>",
+     hint:"Составьте цепочку: USB → Чипсет → CPU → RAM → GPU → Монитор.",
+     question:"Через какие узлы проходит сигнал от USB-клавиатуры до экрана?",
+     qKeys:["чипсет","cpu","ram","gpu","монитор","процессор","память","видеокарт"],
+     qFull:"USB → чипсет → CPU → RAM → GPU → монитор."}
+  ];
+  var SIG_NODES={
+    power:{x:100,y:80,w:140,h:50,label:"Power SW",color:"#2ecc71"},
+    chipset:{x:100,y:200,w:140,h:50,label:"Чипсет",color:"#3d8bff"},
+    psu:{x:100,y:320,w:140,h:50,label:"Блок питания",color:"#f0c040"},
+    power24:{x:320,y:200,w:100,h:50,label:"24-pin",color:"#f0c040"},
+    power8:{x:450,y:200,w:100,h:50,label:"8-pin CPU",color:"#e74c3c"},
+    cpu:{x:100,y:440,w:140,h:50,label:"CPU",color:"#e74c3c"},
+    bios:{x:320,y:440,w:140,h:50,label:"BIOS",color:"#9b59b6"},
+    ram:{x:100,y:540,w:140,h:50,label:"RAM",color:"#4dd0e1"},
+    gpu:{x:320,y:540,w:140,h:50,label:"GPU",color:"#f39c12"},
+    usb:{x:520,y:440,w:140,h:50,label:"USB",color:"#3d8bff"},
+    m2:{x:520,y:540,w:140,h:50,label:"M.2 SSD",color:"#9b59b6"},
+    sata:{x:520,y:320,w:140,h:50,label:"SATA",color:"#f39c12"},
+    monitor:{x:520,y:590,w:140,h:50,label:"Монитор",color:"#8fd0ff"}
+  };
+  var SIG_LINKS=[["power","chipset"],["chipset","psu"],["psu","power24"],["psu","power8"],["power24","cpu"],["power8","cpu"],["cpu","bios"],["cpu","ram"],["cpu","gpu"],["bios","m2"],["bios","sata"],["chipset","usb"],["gpu","monitor"]];
+
+  function initStage4b(){
+    SIG.canvas=$("sigCanvas"); SIG.ctx=SIG.canvas.getContext("2d");
+    SIG.canvasW=SIG.canvas.width; SIG.canvasH=SIG.canvas.height;
+    SIG.step=1; SIG.score=0; SIG.activeNodes={}; SIG.activeLines=[]; SIG.questionAnswered=false;
+    renderSigTheory(); renderSig(); setupSigStep(1); updateSigProgress();
+  }
+  function renderSigTheory(){
+    var box=$("sigTheory"); box.innerHTML="";
+    for(var i=0;i<SIG_STEPS.length;i++){
+      var div=document.createElement("div");
+      div.className="sigStepBlock"+(SIG.step===i+1?" active":"")+(i+1<SIG.step?" done":"");
+      div.id="theory_"+i;
+      div.innerHTML="<b>"+SIG_STEPS[i].title+"</b><br>"+(SIG.step===i+1?SIG_STEPS[i].theory:"<span class='hint'>Появится на шаге "+(i+1)+"</span>");
+      box.appendChild(div);
+    }
+    var act=$("theory_"+(SIG.step-1));
+    if(act) act.scrollIntoView({block:"nearest",behavior:"smooth"});
+  }
+  function setupSigStep(n){
+    SIG.step=n; SIG.activeNodes={}; SIG.activeLines=[]; SIG.questionAnswered=false;
+    $("sigStepNum").textContent=n;
+    $("sigHint").textContent=SIG_STEPS[n-1].hint;
+    $("sigQuestionBox").style.display="none";
+    $("sigQuestionFb").style.display="none";
+    $("sigQuestionAnswer").value="";
+    $("sigExtra").innerHTML="";
+    $("sigNextBtn").disabled=true;
+    renderSigTheory(); renderSig();
+    if(n===1) step1_setup();
+    if(n===2) step2_setup();
+    if(n===3) step3_setup();
+    if(n===4) step4_setup();
+    if(n===5) step5_setup();
+    if(n===6) step6_setup();
+  }
+  function step1_setup(){
+    SIG.canvas.onclick=function(e){
+      var pos=sigMouse(e); var node=sigNodeAt(pos.x,pos.y);
+      if(node&&node.id==="power"){
+        SIG.activeNodes["power"]=true;
+        SIG.activeLines.push(["power","chipset"]);
+        animatePulse("power","chipset","#2ecc71");
+        SIG.canvas.onclick=null;
+        showSigQuestion(0);
+      } else showTip("Кликните по кнопке Power SW",1500);
+    };
+  }
+  var step2_state;
+  function step2_setup(){
+    step2_state={chipset:false,psu:false};
+    SIG.activeNodes["power"]=true; SIG.activeLines.push(["power","chipset"]);
+    SIG.canvas.onclick=function(e){
+      var pos=sigMouse(e); var node=sigNodeAt(pos.x,pos.y);
+      if(!node) return;
+      if(node.id==="chipset"&&!step2_state.chipset){
+        step2_state.chipset=true; SIG.activeNodes["chipset"]=true; renderSig();
+        showTip("✓ Чипсет обработал. Теперь кликните по БП.",2000);
+      } else if(node.id==="psu"&&step2_state.chipset&&!step2_state.psu){
+        step2_state.psu=true; SIG.activeNodes["psu"]=true;
+        SIG.activeLines.push(["chipset","psu"]);
+        animatePulse("chipset","psu","#3d8bff"); renderSig();
+        SIG.canvas.onclick=null;
+        showSigQuestion(1);
+      } else if(node.id==="psu"&&!step2_state.chipset){
+        showTip("Сначала сигнал должен пройти через чипсет",2000);
+      }
+    };
+  }
+  var step3_state;
+  function step3_setup(){
+    step3_state={placed:{}};
+    var box=$("sigExtra");
+    box.innerHTML="<p><b>Отметьте, какие напряжения приходят:</b></p>";
+    var s24=document.createElement("div");
+    s24.className="dropZone"; s24.textContent="24-pin (нажмите)";
+    s24.addEventListener("click",function(){
+      if(step3_state.placed.slot24) return;
+      step3_state.placed.slot24=true;
+      s24.className="dropZone filled"; s24.textContent="✓ 24-pin запитан";
+      checkStep3();
+    });
+    box.appendChild(s24);
+    var s8=document.createElement("div");
+    s8.className="dropZone"; s8.textContent="8-pin: перетащите +12V";
+    s8.addEventListener("dragover",function(e){e.preventDefault();s8.className="dropZone hover";});
+    s8.addEventListener("dragleave",function(){ if(s8.className.indexOf("filled")===-1) s8.className="dropZone"; });
+    s8.addEventListener("drop",function(e){
+      e.preventDefault();
+      var v=e.dataTransfer.getData("text/plain");
+      if(v==="v12"){
+        s8.className="dropZone filled"; s8.textContent="✓ +12V → 8-pin";
+        step3_state.placed.slot8=true;
+        var item=$("v_v12"); if(item) item.className="dragChip used";
+        checkStep3();
+      } else { s8.className="dropZone"; showTip("8-pin питает процессор — нужно +12V",2000); }
+    });
+    box.appendChild(s8);
+    var v12=document.createElement("span");
+    v12.className="dragChip"; v12.textContent="+12V"; v12.id="v_v12";
+    v12.setAttribute("draggable","true");
+    v12.addEventListener("dragstart",function(e){e.dataTransfer.setData("text/plain","v12");});
+    box.appendChild(v12);
+  }
+  function checkStep3(){
+    if(step3_state.placed.slot8&&step3_state.placed.slot24){
+      SIG.activeNodes["psu"]=true; SIG.activeNodes["power24"]=true; SIG.activeNodes["power8"]=true;
+      SIG.activeLines.push(["psu","power24"],["psu","power8"],["power24","cpu"],["power8","cpu"]);
+      renderSig();
+      SIG.canvas.onclick=null;
+      showSigQuestion(2);
+    }
+  }
+  function step4_setup(){
+    SIG.activeNodes["cpu"]=true; SIG.activeNodes["bios"]=true; SIG.activeNodes["ram"]=true; SIG.activeNodes["gpu"]=true;
+    SIG.activeLines.push(["cpu","bios"],["cpu","ram"],["cpu","gpu"]);
+    renderSig();
+    var box=$("sigExtra");
+    box.innerHTML="<p><b>Запустите POST:</b></p>";
+    var b1=document.createElement("button"); b1.className="secondary"; b1.textContent="Запустить POST (успешно)";
+    b1.addEventListener("click",function(){
+      box.innerHTML+="<p style='color:#2ecc71'>✓ POST пройден.</p>";
+      b1.disabled=true; b2.disabled=true;
+      showSigQuestion(3);
+    });
+    var b2=document.createElement("button"); b2.className="secondary"; b2.textContent="Запустить (ошибка RAM)";
+    b2.style.marginLeft="8px";
+    b2.addEventListener("click",function(){
+      box.innerHTML+="<p style='color:#e74c3c'>✗ POST остановлен: ошибка RAM.</p>";
+      showTip("При ошибке RAM POST не пройдёт.",3000);
+    });
+    box.appendChild(b1); box.appendChild(b2);
+  }
+  function step5_setup(){
+    SIG.activeNodes["bios"]=true;
+    var box=$("sigExtra");
+    box.innerHTML="<p><b>Выберите загрузочное устройство:</b></p>";
+    var devices=[
+      {id:"m2",label:"M.2 SSD (с ОС)",ok:true},
+      {id:"usb",label:"USB-флешка (пустая)",ok:false},
+      {id:"sata",label:"SATA HDD (без ОС)",ok:false}
+    ];
+    devices.forEach(function(d){
+      var b=document.createElement("button"); b.className="secondary"; b.textContent=d.label; b.style.margin="4px";
+      b.addEventListener("click",function(){
+        if(d.ok){
+          SIG.activeNodes["m2"]=true; SIG.activeLines.push(["bios","m2"]); renderSig();
+          showSigQuestion(4);
+        } else showTip("✗ На этом устройстве нет загрузочного сектора",2000);
+      });
+      box.appendChild(b);
+    });
+  }
+  function step6_setup(){
+    SIG.activeNodes["usb"]=true; SIG.activeNodes["chipset"]=true; SIG.activeNodes["cpu"]=true;
+    SIG.activeNodes["ram"]=true; SIG.activeNodes["gpu"]=true; SIG.activeNodes["monitor"]=true;
+    SIG.activeLines=SIG_LINKS.slice();
+    renderSig();
+    showSigQuestion(5);
+  }
+  function showSigQuestion(idx){
+    var q=SIG_STEPS[idx];
+    $("sigQuestionBox").style.display="block";
+    $("sigQuestionText").textContent=q.question;
+    $("sigQuestionFb").style.display="none";
+    $("sigQuestionAnswer").value="";
+    var btn=$("sigQuestionBtn");
+    var nb=btn.cloneNode(true);
+    btn.parentNode.replaceChild(nb,btn);
+    nb.addEventListener("click",function(){
+      var ans=$("sigQuestionAnswer").value.toLowerCase();
+      var ok=false;
+      for(var i=0;i<q.qKeys.length;i++) if(ans.indexOf(q.qKeys[i])!==-1){ ok=true; break; }
+      var fb=$("sigQuestionFb"); fb.style.display="block";
+      if(ok||ans.length>=8){
+        fb.className="feedback ok";
+        fb.textContent="✓ Верно.\n"+q.qFull;
+        if(!SIG.questionAnswered){ SIG.score+=3; SIG.questionAnswered=true; updateSigProgress(); }
+        $("sigNextBtn").disabled=false;
+      } else { fb.className="feedback bad"; fb.textContent="✗ Попробуйте снова."; }
+    });
+  }
+  function updateSigProgress(){ $("sigScore").textContent=SIG.score; }
+  $("sigNextBtn").addEventListener("click",function(){
+    if(SIG.step<SIG.totalSteps){ setupSigStep(SIG.step+1); }
+    else {
+      SIG.score+=2;
+      if(SIG.score>20) SIG.score=20;
+      S.stage4b.score=SIG.score; S.stage4b.status="сдано";
+      updateSigProgress();
+      log("Этап 7: "+S.stage4b.score+"/20");
+      showTip("Этап 7: "+S.stage4b.score+"/20",2500);
+      $("btnStage4b").disabled=false; $("sigNextBtn").disabled=true;
+      refreshStageNav();
+    }
+  });
+  $("btnStage4b").addEventListener("click",function(){
+    if(!S.stage4b.status||S.stage4b.status!=="сдано"){ S.stage4b.score=Math.min(20,SIG.score); S.stage4b.status="сдано"; }
+    refreshStageNav(); goToStage(8);
+  });
+  function sigMouse(e){var rect=SIG.canvas.getBoundingClientRect();return{x:(e.clientX-rect.left)*(SIG.canvasW/rect.width),y:(e.clientY-rect.top)*(SIG.canvasH/rect.height)};}
+  function sigNodeAt(x,y){for(var id in SIG_NODES){if(!SIG_NODES.hasOwnProperty(id)) continue;var n=SIG_NODES[id];if(x>=n.x&&x<=n.x+n.w&&y>=n.y&&y<=n.y+n.h) return {id:id,node:n};}return null;}
+  function animatePulse(fromId,toId,color){
+    SIG.pulse={t:0,active:true,from:fromId,to:toId,color:color};
+    var start=Date.now(),dur=900;
+    function tick(){
+      var t=Math.min(1,(Date.now()-start)/dur);
+      SIG.pulse.t=t; renderSig();
+      if(t<1) requestAnimationFrame(tick);
+      else { SIG.pulse.active=false; renderSig(); }
+    }
+    tick();
+  }
+  function renderSig(){
+    var ctx=SIG.ctx,W=SIG.canvasW,H=SIG.canvasH;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0a0f15"; ctx.fillRect(0,0,W,H);
+    for(var i=0;i<SIG_LINKS.length;i++){
+      var a=SIG_NODES[SIG_LINKS[i][0]],b=SIG_NODES[SIG_LINKS[i][1]];
+      if(!a||!b) continue;
+      var isActive=false;
+      for(var j=0;j<SIG.activeLines.length;j++){
+        if((SIG.activeLines[j][0]===SIG_LINKS[i][0]&&SIG.activeLines[j][1]===SIG_LINKS[i][1])||(SIG.activeLines[j][0]===SIG_LINKS[i][1]&&SIG.activeLines[j][1]===SIG_LINKS[i][0])){isActive=true;break;}
+      }
+      ctx.beginPath(); ctx.moveTo(a.x+a.w/2,a.y+a.h/2); ctx.lineTo(b.x+b.w/2,b.y+b.h/2);
+      ctx.strokeStyle=isActive?"#2ecc71":"#2a3548"; ctx.lineWidth=isActive?3:2; ctx.stroke();
+    }
+    for(var id in SIG_NODES){
+      if(!SIG_NODES.hasOwnProperty(id)) continue;
+      var n=SIG_NODES[id];
+      var isActive=!!SIG.activeNodes[id];
+      ctx.fillStyle=isActive?n.color:"#1a2331";
+      ctx.fillRect(n.x,n.y,n.w,n.h);
+      ctx.strokeStyle=isActive?"#8fd0ff":"#55637a"; ctx.lineWidth=2;
+      ctx.strokeRect(n.x,n.y,n.w,n.h);
+      ctx.fillStyle=isActive?"#fff":"#8899b0"; ctx.font="bold 13px Segoe UI"; ctx.textAlign="center";
+      ctx.fillText(n.label,n.x+n.w/2,n.y+n.h/2+5);
+    }
+    if(SIG.pulse.active){
+      var a2=SIG_NODES[SIG.pulse.from],b2=SIG_NODES[SIG.pulse.to];
+      if(a2&&b2){
+        var px=a2.x+a2.w/2+(b2.x+b2.w/2-a2.x-a2.w/2)*SIG.pulse.t;
+        var py=a2.y+a2.h/2+(b2.y+b2.h/2-a2.y-a2.h/2)*SIG.pulse.t;
+        ctx.beginPath(); ctx.arc(px,py,8,0,Math.PI*2);
+        ctx.fillStyle=SIG.pulse.color; ctx.fill();
+        ctx.strokeStyle="#fff"; ctx.lineWidth=2; ctx.stroke();
       }
     }
   }
 
-  function drawBoard3D(project, bx, by, bz){
-    var ctx = S3.ctx;
-    var w = 400, h = 280;
-    var corners = [[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]];
-    // боковые рёбра
-    for (var i=0;i<4;i++){
-      var a = corners[i], b = corners[(i+1)%4];
-      var pa = project(bx+a[0], by+a[1], bz);
-      var pb = project(bx+b[0], by+b[1], bz);
-      var pa0 = project(bx+a[0], by+a[1], 0);
-      var pb0 = project(bx+b[0], by+b[1], 0);
-      ctx.beginPath();
-      ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.lineTo(pb0.x,pb0.y); ctx.lineTo(pa0.x,pa0.y); ctx.closePath();
-      ctx.fillStyle = "#0a1a10"; ctx.fill();
-    }
-    // верхняя грань
-    ctx.beginPath();
-    for (var j=0;j<4;j++){
-      var pj = project(bx+corners[j][0], by+corners[j][1], bz);
-      if (j===0) ctx.moveTo(pj.x,pj.y); else ctx.lineTo(pj.x,pj.y);
-    }
-    ctx.closePath();
-    ctx.fillStyle = "#14361f"; ctx.fill();
-    ctx.strokeStyle = "#2ecc71"; ctx.lineWidth = 2; ctx.stroke();
-
-    // намёк на компоненты: сокет, RAM, чипсет
-    // сокет (слева)
-    var sc = project(bx-100, by, bz+2);
-    ctx.fillStyle = "#1a3a55"; ctx.fillRect(sc.x-30, sc.y-25, 60, 50);
-    ctx.strokeStyle = "#3d8bff"; ctx.strokeRect(sc.x-30, sc.y-25, 60, 50);
-    // RAM (справа)
-    for (var rr=0; rr<2; rr++){
-      var rm = project(bx+80, by-30+rr*30, bz+2);
-      ctx.fillStyle = "#1e3a55"; ctx.fillRect(rm.x-15, rm.y-8, 30, 16);
-      ctx.strokeStyle = "#4dd0e1"; ctx.strokeRect(rm.x-15, rm.y-8, 30, 16);
-    }
-    // чипсет
-    var ch = project(bx+60, by+70, bz+2);
-    ctx.fillStyle = "#1a1e2e"; ctx.fillRect(ch.x-25, ch.y-15, 50, 30);
-    ctx.strokeStyle = "#3d8bff"; ctx.strokeRect(ch.x-25, ch.y-15, 50, 30);
-  }
-
-  /* ============================================================
-     ЭТАП 4: МАРШРУТЫ ДАННЫХ
-     ============================================================ */
-  var NODES4 = [
-    { id:"cpu",   name:"ПРОЦЕССОР", x:35, y:6,  w:220, h:60 },
-    { id:"ram",   name:"RAM",       x:5,  y:32, w:150, h:60 },
-    { id:"gpu",   name:"GPU (PCIe)",x:68, y:32, w:200, h:60 },
-    { id:"chip",  name:"ЧИПСЕТ",    x:38, y:55, w:200, h:60 },
-    { id:"m2",    name:"M.2 SSD",   x:2,  y:80, w:150, h:60 },
-    { id:"sata",  name:"SATA HDD",  x:20, y:80, w:160, h:60 },
-    { id:"usb",   name:"USB",       x:40, y:80, w:130, h:60 },
-    { id:"audio", name:"Аудио",     x:58, y:80, w:130, h:60 },
-    { id:"net",   name:"Сеть",      x:76, y:80, w:130, h:60 }
+  /* ============ ЭТАП 8: МАРШРУТЫ ============ */
+  var NODES4=[
+    {id:"cpu",name:"ПРОЦЕССОР",x:35,y:6,w:220,h:60},
+    {id:"ram",name:"RAM",x:5,y:32,w:150,h:60},
+    {id:"gpu",name:"GPU (PCIe)",x:68,y:32,w:200,h:60},
+    {id:"chip",name:"ЧИПСЕТ",x:38,y:55,w:200,h:60},
+    {id:"m2",name:"M.2 SSD",x:2,y:80,w:150,h:60},
+    {id:"sata",name:"SATA HDD",x:20,y:80,w:160,h:60},
+    {id:"usb",name:"USB",x:40,y:80,w:130,h:60},
+    {id:"audio",name:"Аудио",x:58,y:80,w:130,h:60},
+    {id:"net",name:"Сеть",x:76,y:80,w:130,h:60}
   ];
-  var ROUTES4 = [
-    { key:"cpu_ram",   label:"Процессор → RAM",          path:["cpu","ram"] },
-    { key:"cpu_gpu",   label:"Процессор → Видеокарта",   path:["cpu","gpu"] },
-    { key:"m2",        label:"M.2 SSD → Чипсет → CPU",   path:["m2","chip","cpu"] },
-    { key:"usb",       label:"USB → Чипсет → CPU",       path:["usb","chip","cpu"] },
-    { key:"sata",      label:"HDD SATA → Чипсет → CPU",  path:["sata","chip","cpu"] },
-    { key:"audio",     label:"Аудио → Чипсет → CPU",     path:["audio","chip","cpu"] },
-    { key:"net",       label:"Сеть → Чипсет → CPU",      path:["net","chip","cpu"] }
+  var ROUTES4=[
+    {key:"cpu_ram",label:"Процессор → RAM",path:["cpu","ram"]},
+    {key:"cpu_gpu",label:"Процессор → Видеокарта",path:["cpu","gpu"]},
+    {key:"m2",label:"M.2 → Чипсет → CPU",path:["m2","chip","cpu"]},
+    {key:"usb",label:"USB → Чипсет → CPU",path:["usb","chip","cpu"]},
+    {key:"sata",label:"SATA → Чипсет → CPU",path:["sata","chip","cpu"]},
+    {key:"audio",label:"Аудио → Чипсет → CPU",path:["audio","chip","cpu"]},
+    {key:"net",label:"Сеть → Чипсет → CPU",path:["net","chip","cpu"]}
   ];
-  var s4 = { activeRoute:null, picked:[], done:{}, routesDone:0 };
-
+  var s4={activeRoute:null,picked:[],done:{},routesDone:0};
   function initStage4(){
-    s4.activeRoute = null; s4.picked = []; s4.done = {}; s4.routesDone = 0;
-    $("routesDone").textContent = "0";
-    $("routeSvg").innerHTML = "";
-
-    var rl = $("routeList");
-    rl.innerHTML = "";
-    for (var i=0;i<ROUTES4.length;i++){
+    s4.activeRoute=null; s4.picked=[]; s4.done={}; s4.routesDone=0;
+    $("routesDone").textContent="0"; $("routeSvg").innerHTML="";
+    var rl=$("routeList"); rl.innerHTML="";
+    for(var i=0;i<ROUTES4.length;i++){
       (function(r){
-        var el = document.createElement("div");
-        el.className = "routeCard";
-        el.id = "route_" + r.key;
-        el.textContent = r.label;
-        el.addEventListener("click", function(){
-          if (s4.done[r.key]) return;
-          s4.activeRoute = r;
-          s4.picked = [];
-          clearRouteSvg();
-          var all = rl.querySelectorAll(".routeCard");
-          for (var a=0;a<all.length;a++) all[a].className = "routeCard" + (all[a].id === el.id ? " active" : "");
-          showTip("Выбран: " + r.label + ". Кликайте по узлам по порядку.", 2500);
+        var el=document.createElement("div");
+        el.className="routeCard"; el.id="route_"+r.key; el.textContent=r.label;
+        el.addEventListener("click",function(){
+          if(s4.done[r.key]) return;
+          s4.activeRoute=r; s4.picked=[]; clearRouteSvg();
+          var all=rl.querySelectorAll(".routeCard");
+          for(var a=0;a<all.length;a++) all[a].className="routeCard"+(all[a].id===el.id?" active":"");
+          showTip("Выбран: "+r.label,2000);
         });
         rl.appendChild(el);
       })(ROUTES4[i]);
     }
-
-    var d = $("routeDiagram");
-    var olds = d.querySelectorAll(".node");
-    for (var o=0;o<olds.length;o++) olds[o].remove();
-    for (var n=0;n<NODES4.length;n++){
+    var d=$("routeDiagram");
+    var olds=d.querySelectorAll(".node");
+    for(var o=0;o<olds.length;o++) olds[o].remove();
+    for(var n=0;n<NODES4.length;n++){
       (function(node){
-        var el = document.createElement("div");
-        el.className = "node";
-        el.id = "n_" + node.id;
-        el.style.left = node.x + "%"; el.style.top = node.y + "%";
-        el.style.width = node.w + "px"; el.style.height = node.h + "px";
-        el.style.display = "flex"; el.style.alignItems = "center"; el.style.justifyContent = "center";
-        el.textContent = node.name;
-        el.addEventListener("click", function(){ s4_pickNode(node); });
+        var el=document.createElement("div");
+        el.className="node"; el.id="n_"+node.id;
+        el.style.left=node.x+"%"; el.style.top=node.y+"%";
+        el.style.width=node.w+"px"; el.style.height=node.h+"px";
+        el.style.display="flex"; el.style.alignItems="center"; el.style.justifyContent="center";
+        el.textContent=node.name;
+        el.addEventListener("click",function(){s4_pickNode(node);});
         d.appendChild(el);
       })(NODES4[n]);
     }
   }
-
-  function clearRouteSvg(){ $("routeSvg").innerHTML = ""; }
-
-  function drawRouteLine(fromId, toId, color){
-    var from = $("n_"+fromId), to = $("n_"+toId);
-    if (!from || !to) return;
-    var diag = $("routeDiagram").getBoundingClientRect();
-    var fr = from.getBoundingClientRect(), tr = to.getBoundingClientRect();
-    var x1 = fr.left - diag.left + fr.width/2;
-    var y1 = fr.top  - diag.top  + fr.height/2;
-    var x2 = tr.left - diag.left + tr.width/2;
-    var y2 = tr.top  - diag.top  + tr.height/2;
-    var line = document.createElementNS("http://www.w3.org/2000/svg","line");
-    line.setAttribute("x1", x1); line.setAttribute("y1", y1);
-    line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-    line.setAttribute("stroke", color);
-    line.setAttribute("stroke-width", "3");
-    line.setAttribute("stroke-linecap", "round");
+  function clearRouteSvg(){ $("routeSvg").innerHTML=""; }
+  function drawRouteLine(fromId,toId,color){
+    var from=$("n_"+fromId),to=$("n_"+toId);
+    if(!from||!to) return;
+    var diag=$("routeDiagram").getBoundingClientRect();
+    var fr=from.getBoundingClientRect(),tr=to.getBoundingClientRect();
+    var line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",fr.left-diag.left+fr.width/2);
+    line.setAttribute("y1",fr.top-diag.top+fr.height/2);
+    line.setAttribute("x2",tr.left-diag.left+tr.width/2);
+    line.setAttribute("y2",tr.top-diag.top+tr.height/2);
+    line.setAttribute("stroke",color); line.setAttribute("stroke-width","3"); line.setAttribute("stroke-linecap","round");
     $("routeSvg").appendChild(line);
   }
-
   function s4_pickNode(node){
-    if (!s4.activeRoute){ showTip("Сначала выберите маршрут слева", 1800); return; }
-    if (s4.done[s4.activeRoute.key]) return;
-    if (s4.picked.indexOf(node.id) !== -1) return;
-
-    var expected = s4.activeRoute.path[s4.picked.length];
-    if (node.id !== expected){
-      var el = $("n_" + node.id);
-      el.className = "node route-bad";
-      setTimeout(function(){ el.className = "node"; }, 800);
-      showTip("✗ Не тот узел", 1500);
-      s4.picked = [];
-      clearRouteSvg();
-      return;
+    if(!s4.activeRoute){ showTip("Сначала выберите маршрут",1800); return; }
+    if(s4.done[s4.activeRoute.key]) return;
+    if(s4.picked.indexOf(node.id)!==-1) return;
+    var expected=s4.activeRoute.path[s4.picked.length];
+    if(node.id!==expected){
+      var el=$("n_"+node.id); el.className="node route-bad";
+      setTimeout(function(){el.className="node";},800);
+      showTip("✗ Не тот узел",1500); s4.picked=[]; clearRouteSvg(); return;
     }
     s4.picked.push(node.id);
-    $("n_" + node.id).className = "node picked";
-    if (s4.picked.length >= 2){
-      drawRouteLine(s4.picked[s4.picked.length-2], node.id, "#8fd0ff");
-    }
-    if (s4.picked.length === s4.activeRoute.path.length){
-      s4.done[s4.activeRoute.key] = true;
-      s4.routesDone++;
-      $("routesDone").textContent = s4.routesDone;
-      for (var i=0;i<s4.picked.length;i++){
-        var u = $("n_" + s4.picked[i]);
-        if (u) u.className = "node route-ok";
-      }
+    $("n_"+node.id).className="node picked";
+    if(s4.picked.length>=2) drawRouteLine(s4.picked[s4.picked.length-2],node.id,"#8fd0ff");
+    if(s4.picked.length===s4.activeRoute.path.length){
+      s4.done[s4.activeRoute.key]=true; s4.routesDone++;
+      $("routesDone").textContent=s4.routesDone;
+      for(var i=0;i<s4.picked.length;i++){var u=$("n_"+s4.picked[i]);if(u)u.className="node route-ok";}
       clearRouteSvg();
-      for (var j=1;j<s4.picked.length;j++){
-        drawRouteLine(s4.picked[j-1], s4.picked[j], "#2ecc71");
-      }
-      $("route_" + s4.activeRoute.key).className = "routeCard done";
-      log("Этап 4: маршрут " + s4.activeRoute.key + " верный");
-      s4.activeRoute = null;
-      s4.picked = [];
-      if (s4.routesDone === ROUTES4.length){
-        $("btnStage4").disabled = false;
-        showTip("✓ Все маршруты проложены", 2000);
-      }
+      for(var j=1;j<s4.picked.length;j++) drawRouteLine(s4.picked[j-1],s4.picked[j],"#2ecc71");
+      $("route_"+s4.activeRoute.key).className="routeCard done";
+      s4.activeRoute=null; s4.picked=[];
+      if(s4.routesDone===ROUTES4.length){ $("btnStage4").disabled=false; showTip("✓ Все маршруты проложены",2000); }
     }
   }
-
-  $("btnStage4").addEventListener("click", function(){
-    S.stage4.score = Math.round(s4.routesDone / ROUTES4.length * 10);
-    S.stage4.status = "сдано";
-    log("Этап 4: балл " + S.stage4.score + "/10");
-    showTip("Этап 4: " + S.stage4.score + "/10", 2000);
-    refreshStageNav();
-    goToStage(5);
+  $("btnStage4").addEventListener("click",function(){
+    S.stage4.score=Math.round(s4.routesDone/ROUTES4.length*6); S.stage4.status="сдано";
+    log("Этап 8: "+S.stage4.score+"/6"); showTip("Этап 8: "+S.stage4.score+"/6",2000);
+    refreshStageNav(); goToStage(9);
   });
 
-  /* ============================================================
-     ЭТАП 5: СИГНАЛ
-     ============================================================ */
-  var SIGNAL_STEPS = [
-    "Power SW: замыкание контакта на F_PANEL",
-    "Супервизор/чипсет: проверка напряжений БП",
-    "PS_ON: команда БП выйти из режима ожидания",
-    "БП подаёт +3.3V/+5V/+12V на плату",
-    "CPU запускает BIOS/UEFI, проходит POST",
-    "Поиск загрузчика и передача управления ОС"
-  ];
-  var SIGNAL_CORRECT = [0,1,2,3,4,5];
-  var signalOrder = [];
-
-  function initStage5(){
-    var chain = $("signalChain"), slots = $("signalSlots");
-    chain.innerHTML = ""; slots.innerHTML = "";
-    signalOrder = [];
-    var shuffled = SIGNAL_STEPS.slice();
-    shuffled.sort(function(){ return Math.random()-0.5; });
-    var textToIdx = {};
-    for (var t=0;t<SIGNAL_STEPS.length;t++) textToIdx[SIGNAL_STEPS[t]] = t;
-    for (var i=0;i<shuffled.length;i++){
-      (function(txt){
-        var el = document.createElement("div");
-        el.className = "signalStep";
-        el.setAttribute("draggable","true");
-        el.textContent = txt;
-        el.addEventListener("dragstart", function(e){ e.dataTransfer.setData("text/plain", txt); });
-        chain.appendChild(el);
-      })(shuffled[i]);
-    }
-    for (var s=0;s<6;s++){
-      (function(n){
-        var slot = document.createElement("div");
-        slot.className = "signalSlot";
-        slot.textContent = "Слот " + (n+1);
-        slot.addEventListener("dragover", function(e){ e.preventDefault(); slot.className = "signalSlot hover"; });
-        slot.addEventListener("dragleave", function(){ if (slot.className.indexOf("filled")===-1) slot.className = "signalSlot"; });
-        slot.addEventListener("drop", function(e){
-          e.preventDefault();
-          slot.className = "signalSlot filled";
-          var txt = e.dataTransfer.getData("text/plain");
-          slot.textContent = (n+1) + ". " + txt;
-          signalOrder[n] = textToIdx[txt];
-        });
-        slots.appendChild(slot);
-      })(s);
-    }
-    var conds = [
-      {text:"Установлен процессор", critical:true},
-      {text:"Установлена оперативная память", critical:true},
-      {text:"Подключён 24-pin ATX", critical:true},
-      {text:"Подключён 8-pin CPU", critical:true},
-      {text:"Есть встроенное видео или установлена видеокарта", critical:true},
-      {text:"Подключена кнопка Power SW", critical:true},
-      {text:"Установлен диск с ОС", critical:false},
-      {text:"Подключён USB-хаб", critical:false}
-    ];
-    var condBox = $("powerConds");
-    condBox.innerHTML = "";
-    for (var c2=0;c2<conds.length;c2++){
-      var lab = document.createElement("label");
-      lab.style.display = "block";
-      lab.style.margin = "6px 0";
-      lab.innerHTML = "<input type='checkbox' data-idx='" + c2 + "'> " + conds[c2].text;
-      condBox.appendChild(lab);
-    }
-    S.stage5.conds = conds;
-  }
-
-  $("btnCheckOrder").addEventListener("click", function(){
-    var filled = 0;
-    for (var i=0;i<6;i++) if (typeof signalOrder[i] === "number") filled++;
-    if (filled < 6){ showTip("Заполните все 6 слотов", 1500); return; }
-    var ok = true;
-    for (var j=0;j<6;j++) if (signalOrder[j] !== SIGNAL_CORRECT[j]){ ok = false; break; }
-    S.stage5.orderScore = ok ? 6 : 0;
-    showTip(ok ? "✓ Порядок верный" : "✗ Порядок нарушен", 2500);
-    $("powerDiagram").style.display = "block";
-    checkStage5Full();
-  });
-
-  $("btnCheckConds").addEventListener("click", function(){
-    var boxes = $("powerConds").querySelectorAll("input[type=checkbox]");
-    var correct = 0;
-    for (var i=0;i<boxes.length;i++){
-      var idx = parseInt(boxes[i].getAttribute("data-idx"), 10);
-      if (boxes[i].checked === S.stage5.conds[idx].critical) correct++;
-    }
-    S.stage5.condScore = Math.round(correct / boxes.length * 6);
-    showTip("Условия: " + S.stage5.condScore + "/6", 2000);
-    checkStage5Full();
-  });
-
-  function checkStage5Full(){
-    if (S.stage5.orderScore !== null && S.stage5.condScore !== null){
-      $("btnStage5").disabled = false;
-    }
-  }
-
-  $("btnStage5").addEventListener("click", function(){
-    S.stage5.score = (S.stage5.orderScore || 0) + (S.stage5.condScore || 0);
-    if (S.stage5.score > 12) S.stage5.score = 12;
-    S.stage5.status = "сдано";
-    log("Этап 5: балл " + S.stage5.score + "/12");
-    showTip("Этап 5: " + S.stage5.score + "/12", 2000);
-    refreshStageNav();
-    goToStage(6);
-  });
-
-  /* ============================================================
-     ЭТАП 6: ДИАГНОСТИКА (10 ситуаций)
-     ============================================================ */
-  var DIAG = [
-    {q:"ПК не включается, вентиляторы не крутятся, индикатор не горит.",
-     options:["Не подключён 24-pin ATX","Нет оперативной памяти","Нет видеокарты","Не подключён SATA"], correct:0},
-    {q:"ПК включается, но нет изображения, вентиляторы крутятся.",
-     options:["Нет видеокарты или встроенного видео","Не подключён Power SW","Не работает USB","Не подключён HDD"], correct:0},
-    {q:"ПК работает, но перезагружается под нагрузкой.",
-     options:["Слабый БП или перегрев VRM","Нет SATA","Не подключён Reset SW","Не работает аудио"], correct:0},
-    {q:"ПК включается, но кнопка Reset не работает.",
-     options:["Не подключён Reset SW к F_PANEL","Не подключён 24-pin","Нет драйвера Reset","Повреждён BIOS"], correct:0},
-    {q:"Индикатор HDD LED не горит, хотя диск работает.",
-     options:["Не подключён HDD LED к F_PANEL","Не подключён SATA","Не работает диск","Не подключён 24-pin"], correct:0},
-    {q:"Передние USB-порты не работают, задние работают.",
-     options:["Не подключён F_USB к плате","Не подключён USB-контроллер","Сломан чипсет","Не работает Windows"], correct:0},
-    {q:"Звук есть через задние разъёмы, но не работает передняя аудио-панель.",
-     options:["Не подключён F_AUDIO к плате","Не подключён SATA","Не работает диск","Не подключён 24-pin"], correct:0},
-    {q:"ПК не видит один из SATA-дисков, второй работает.",
-     options:["Не подключён кабель данных или питания к диску","Не работает БП","Не работает чипсет","Не подключён Reset SW"], correct:0},
-    {q:"CPU определяется, но показывает заниженную частоту.",
-     options:["Перегрев или ограничение VRM","Нет SATA","Не подключён Power LED","Не работает USB"], correct:0},
-    {q:"ПК включается, но через секунду выключается и снова включается.",
-     options:["Проблема с питанием: БП или КЗ платы","Нет SATA","Не подключён HDD LED","Не работает аудио"], correct:0}
+  /* ============ ЭТАП 9: ДИАГНОСТИКА (16) ============ */
+  var DIAG=[
+    {q:"ПК не включается, вентиляторы не крутятся, индикатор не горит.",options:["Не подключён 24-pin ATX","Нет RAM","Нет видеокарты","Не подключён SATA"],correct:0},
+    {q:"ПК включается, но нет изображения, вентиляторы крутятся.",options:["Нет видеокарты или встроенного видео","Не подключён Power SW","Не работает USB","Не подключён HDD"],correct:0},
+    {q:"ПК работает, но перезагружается под нагрузкой.",options:["Слабый БП или перегрев VRM","Нет SATA","Не подключён Reset SW","Не работает аудио"],correct:0},
+    {q:"Кнопка Reset не работает.",options:["Не подключён Reset SW к F_PANEL","Не подключён 24-pin","Нет драйвера","Повреждён BIOS"],correct:0},
+    {q:"Индикатор HDD LED не горит, хотя диск работает.",options:["Не подключён HDD LED к F_PANEL","Не подключён SATA","Не работает диск","Не подключён 24-pin"],correct:0},
+    {q:"Передние USB-порты не работают, задние работают.",options:["Не подключён F_USB к плате","Не подключён USB-контроллер","Сломан чипсет","Не работает Windows"],correct:0},
+    {q:"Передняя аудио-панель не работает.",options:["Не подключён F_AUDIO к плате","Не подключён SATA","Не работает диск","Не подключён 24-pin"],correct:0},
+    {q:"ПК не видит один из SATA-дисков, второй работает.",options:["Не подключён кабель данных или питания","Не работает БП","Не работает чипсет","Не подключён Reset SW"],correct:0},
+    {q:"CPU определяется, но частота занижена.",options:["Перегрев или ограничение VRM","Нет SATA","Не подключён Power LED","Не работает USB"],correct:0},
+    {q:"ПК включается, через секунду выключается и снова включается.",options:["Проблема с питанием: БП или КЗ платы","Нет SATA","Не подключён HDD LED","Не работает аудио"],correct:0},
+    {q:"Вентиляторы дёрнулись и остановились, горит индикатор CPU.",options:["Не подключён 8-pin EPS","Нет видеокарты","Не подключён SATA","Сломан Power SW"],correct:0},
+    {q:"Вентиляторы крутятся, изображения нет, горит индикатор VGA.",options:["Нет питания видеокарты или она не вставлена","Не подключён 8-pin EPS","Не работает USB","Сломан Reset SW"],correct:0},
+    {q:"Экран есть, но «No bootable device», горит индикатор BOOT.",options:["Нет питания/кабеля данных SATA или нет загрузочного сектора","Не подключён 24-pin","Не работает чипсет","Сломан BIOS"],correct:0},
+    {q:"Standby-индикатор горит, но кнопка Power ничего не запускает.",options:["Power SW подключён не к тем контактам F_PANEL","Не подключён 24-pin","Не работает BIOS","Не подключён HDD LED"],correct:0},
+    {q:"На экране «CPU Fan Error», загрузка продолжается.",options:["Не подключён CPU_FAN","Нет SATA","Не подключён Reset SW","Сломан Power SW"],correct:0},
+    {q:"БП включён, но плата обесточена, standby-индикатор не горит.",options:["Не подключён 24-pin ATX","Сломан BIOS","Не работает USB","Нет RAM"],correct:0}
   ];
   function initStage6(){
-    var list = $("diagList");
-    list.innerHTML = "";
-    for (var i=0;i<DIAG.length;i++){
-      (function(d, idx){
-        var div = document.createElement("div");
-        div.style.marginBottom = "14px";
-        div.innerHTML = "<b>" + (idx+1) + ". " + d.q + "</b>";
-        for (var j=0;j<d.options.length;j++){
-          var lab = document.createElement("label");
-          lab.style.display = "block";
-          lab.style.margin = "4px 0";
-          lab.innerHTML = "<input type='radio' name='diag"+idx+"' value='"+j+"'> " + d.options[j];
-          div.appendChild(lab);
+    var h="";
+    for(var i=0;i<DIAG.length;i++){
+      (function(d,idx){
+        h+="<div class='card' style='background:#1a2331;margin-bottom:10px'><b>"+(idx+1)+". "+d.q+"</b><br>";
+        for(var j=0;j<d.options.length;j++){
+          h+="<label style='display:block;margin:4px 0'><input type='radio' name='diag"+idx+"' value='"+j+"'> "+d.options[j]+"</label>";
         }
-        list.appendChild(div);
-      })(DIAG[i], i);
+        h+="</div>";
+      })(DIAG[i],i);
     }
+    $("diagBody").innerHTML=h;
   }
-  $("btnStage6").addEventListener("click", function(){
-    var correct = 0;
-    for (var i=0;i<DIAG.length;i++){
-      var radios = document.getElementsByName("diag"+i);
-      for (var j=0;j<radios.length;j++){
-        if (radios[j].checked && parseInt(radios[j].value,10) === DIAG[i].correct) correct++;
-      }
+  $("btnStage6").addEventListener("click",function(){
+    var correct=0;
+    for(var i=0;i<DIAG.length;i++){
+      var radios=document.getElementsByName("diag"+i);
+      for(var j=0;j<radios.length;j++) if(radios[j].checked&&parseInt(radios[j].value,10)===DIAG[i].correct) correct++;
     }
-    S.stage6.score = Math.round(correct / DIAG.length * 10);
-    S.stage6.status = "сдано";
-    log("Этап 6: " + correct + "/" + DIAG.length + " — " + S.stage6.score + "/10");
-    showTip("Этап 6: " + S.stage6.score + "/10", 2000);
-    refreshStageNav();
-    goToStage(7);
+    S.stage6.score=Math.round(correct/DIAG.length*11); S.stage6.status="сдано";
+    log("Этап 9: "+correct+"/"+DIAG.length+" = "+S.stage6.score+"/11");
+    showTip("Этап 9: "+S.stage6.score+"/11",2000);
+    refreshStageNav(); goToStage(10);
   });
 
-  /* ============================================================
-     ЭТАП 7: ПОИСК И ОПИСАНИЕ
-     ============================================================ */
-  var COMP_SEARCH = [
-    { key:"socket",  name:"Сокет CPU",
-      nameKeys:["сокет","socket","am5","lga","разъём","разъем","гнездо"],
-      descKeys:["процессор","проц","cpu","цп","центральн","камень"],
-      full:"Сокет — разъём для установки процессора." },
-    { key:"ram",     name:"Слоты RAM",
-      nameKeys:["dimm","ram","ddr","озу","оператив","памят"],
-      descKeys:["оператив","озу","памят","ram","ddr"],
-      full:"Слоты DIMM для оперативной памяти (ОЗУ, DDR5)." },
-    { key:"vrm",     name:"VRM",
-      nameKeys:["vrm","питани","модуль","стабилиз","преобразовател"],
-      descKeys:["питани","питан","процессор","проц","cpu","цп","напряж","стабилиз"],
-      full:"VRM — модуль стабилизации питания процессора." },
-    { key:"chipset", name:"Чипсет",
-      nameKeys:["чипсет","chipset","x870","b650","b760","контроллер","хаб"],
-      descKeys:["перифер","sata","usb","контроллер","чипсет","хаб","мост"],
-      full:"Чипсет — коммутатор периферии: SATA, USB, часть PCIe." },
-    { key:"pcie",    name:"PCIe x16",
-      nameKeys:["pcie","pci-e","pci express","x16"],
-      descKeys:["видеокарт","видео","gpu","графическ","расширен","видеоадаптер"],
-      full:"PCIe x16 — слот для видеокарты и плат расширения." },
-    { key:"m2",      name:"M.2",
-      nameKeys:["m.2","m2","nvme"],
-      descKeys:["ssd","ссд","накопит","nvme","твердотел"],
-      full:"M.2 — слот для SSD NVMe." },
-    { key:"sata",    name:"SATA",
-      nameKeys:["sata"],
-      descKeys:["накопит","hdd","ssd","диск","жёстк","жестк","ссд","винчестер","хард"],
-      full:"SATA — интерфейс для HDD и SSD." },
-    { key:"power24", name:"24-pin ATX",
-      nameKeys:["24","atx","питани","питан"],
-      descKeys:["питани","питан","плат","напряж","энерг","ток"],
-      full:"24-pin ATX — основное питание платы от БП." },
-    { key:"power8",  name:"8-pin CPU",
-      nameKeys:["8","cpu","eps","питани","питан"],
-      descKeys:["процессор","проц","cpu","цп","центральн","камень","питани"],
-      full:"8-pin EPS — питание процессора." }
+  /* ============ ЭТАП 10: ПОИСК ============ */
+  var COMP_SEARCH=[
+    {key:"socket",name:"Сокет CPU",nameKeys:["сокет","socket","am5","lga","разъём","гнездо"],descKeys:["процессор","проц","cpu","цп"],full:"Сокет — разъём для установки процессора."},
+    {key:"ram",name:"Слоты RAM",nameKeys:["dimm","ram","ddr","озу","памят"],descKeys:["оператив","озу","памят"],full:"Слоты DIMM для оперативной памяти."},
+    {key:"vrm",name:"VRM",nameKeys:["vrm","питани","модуль","стабилиз"],descKeys:["питани","процессор","напряж"],full:"VRM — стабилизатор питания процессора."},
+    {key:"chipset",name:"Чипсет",nameKeys:["чипсет","chipset","x870","b650","b760"],descKeys:["перифер","sata","usb","контроллер"],full:"Чипсет — коммутатор периферии."},
+    {key:"pcie",name:"PCIe x16",nameKeys:["pcie","x16"],descKeys:["видеокарт","видео","gpu"],full:"PCIe x16 — слот для видеокарты."},
+    {key:"m2",name:"M.2",nameKeys:["m.2","m2","nvme"],descKeys:["ssd","накопит","nvme"],full:"M.2 — слот для SSD NVMe."},
+    {key:"sata",name:"SATA",nameKeys:["sata"],descKeys:["накопит","hdd","ssd","диск"],full:"SATA — интерфейс для HDD/SSD."},
+    {key:"power24",name:"24-pin ATX",nameKeys:["24","atx"],descKeys:["питани","плат","напряж"],full:"24-pin ATX — основное питание платы."},
+    {key:"power8",name:"8-pin CPU",nameKeys:["8","cpu","eps"],descKeys:["процессор","cpu","питани"],full:"8-pin EPS — питание процессора."}
   ];
-
   function initStage7(){
-    var list = $("compSearchList");
-    list.innerHTML = "";
-    S.stage7.cards = {};
-    for (var i=0;i<COMP_SEARCH.length;i++){
-      (function(c, idx){
-        var card = document.createElement("div");
-        card.className = "searchCard";
-        card.innerHTML =
-          "<div class='scTitle'>" + (idx+1) + ". " + c.name + "</div>" +
-          "<div class='scRow'>" +
-            "<div class='scLeft'>" +
-              "<input type='file' accept='image/*' id='file_"+c.key+"' style='font-size:12px; width:100%;'>" +
-              "<div class='preview' id='preview_"+c.key+"'>Превью появится после загрузки</div>" +
-            "</div>" +
-            "<div class='scRight'>" +
-              "<label style='font-size:13px;'>Название компонента<br><input type='text' id='name_"+c.key+"' placeholder='Например: Socket AM5' style='margin-top:4px;'></label>" +
-              "<label style='font-size:13px; display:block; margin-top:8px;'>Назначение (что делает, что подключается)<br><input type='text' id='desc_"+c.key+"' placeholder='Например: для установки процессора' style='margin-top:4px;'></label>" +
-              "<button type='button' class='secondary' id='btn_"+c.key+"' style='margin-top:8px;'>Проверить</button>" +
-              "<div class='feedback' id='fb_"+c.key+"' style='display:none;'></div>" +
-            "</div>" +
-          "</div>";
+    var list=$("compSearchList"); list.innerHTML=""; S.stage7.cards={};
+    for(var i=0;i<COMP_SEARCH.length;i++){
+      (function(c,idx){
+        var card=document.createElement("div"); card.className="searchCard";
+        card.innerHTML="<div class='scTitle'>"+(idx+1)+". "+c.name+"</div>"+
+          "<div class='scRow'><div class='scLeft'><input type='file' accept='image/*' id='file_"+c.key+"' style='font-size:12px;width:100%'><div class='preview' id='preview_"+c.key+"'>Превью</div></div>"+
+          "<div class='scRight'><label style='font-size:13px'>Название<br><input type='text' id='name_"+c.key+"' placeholder='Socket AM5'></label>"+
+          "<label style='font-size:13px;display:block;margin-top:8px'>Назначение<br><input type='text' id='desc_"+c.key+"' placeholder='для установки процессора'></label>"+
+          "<button type='button' class='secondary' id='btn_"+c.key+"' style='margin-top:8px'>Проверить</button>"+
+          "<div class='feedback' id='fb_"+c.key+"' style='display:none'></div></div></div>";
         list.appendChild(card);
-        S.stage7.cards[c.key] = { file:false, checked:false, score:0, imgUrl:null };
-
-        $("file_"+c.key).addEventListener("change", function(e){
-          var f = e.target.files[0];
-          if (!f) return;
-          var url = URL.createObjectURL(f);
-          $("preview_"+c.key).innerHTML = "<img src='" + url + "'>";
-          S.stage7.cards[c.key].file = true;
-          S.stage7.cards[c.key].imgUrl = url;
+        S.stage7.cards[c.key]={file:false,checked:false,score:0,imgUrl:null};
+        $("file_"+c.key).addEventListener("change",function(e){
+          var f=e.target.files[0]; if(!f) return;
+          var url=URL.createObjectURL(f);
+          $("preview_"+c.key).innerHTML="<img src='"+url+"'>";
+          S.stage7.cards[c.key].file=true; S.stage7.cards[c.key].imgUrl=url;
           refreshCompSearch();
         });
-
-        $("btn_"+c.key).addEventListener("click", function(){
-          var card = S.stage7.cards[c.key];
-          if (!card.file){ showTip("Сначала загрузите изображение", 1500); return; }
-          var nm = $("name_"+c.key).value.toLowerCase();
-          var ds = $("desc_"+c.key).value.toLowerCase();
-          var nameOk = false, descOk = false;
-          for (var k=0;k<c.nameKeys.length;k++) if (nm.indexOf(c.nameKeys[k]) !== -1){ nameOk = true; break; }
-          for (var d=0;d<c.descKeys.length;d++) if (ds.indexOf(c.descKeys[d]) !== -1){ descOk = true; break; }
-          var sc = 1;
-          var msg = "✓ Изображение загружено (1)\n";
-          if (nameOk){ sc += 0.5; msg += "✓ Название верное (0.5)\n"; } else msg += "✗ Название не распознано\n";
-          if (descOk){ sc += 0.7; msg += "✓ Назначение верное (0.7)\n"; } else msg += "✗ Назначение не распознано\n";
-          msg += "\nЭталон: " + c.full;
-          var fb = $("fb_"+c.key);
-          fb.style.display = "block";
-          if (nameOk && descOk) fb.className = "feedback ok";
-          else if (nameOk || descOk) fb.className = "feedback part";
-          else fb.className = "feedback bad";
-          fb.textContent = msg;
-          card.checked = true;
-          card.score = sc;
+        $("btn_"+c.key).addEventListener("click",function(){
+          var card2=S.stage7.cards[c.key];
+          if(!card2.file){ showTip("Сначала загрузите изображение",1500); return; }
+          var nm=$("name_"+c.key).value.toLowerCase();
+          var ds=$("desc_"+c.key).value.toLowerCase();
+          var nameOk=false,descOk=false;
+          for(var k=0;k<c.nameKeys.length;k++) if(nm.indexOf(c.nameKeys[k])!==-1){nameOk=true;break;}
+          for(var d=0;d<c.descKeys.length;d++) if(ds.indexOf(c.descKeys[d])!==-1){descOk=true;break;}
+          var sc=1;
+          var msg="✓ Изображение загружено\n";
+          if(nameOk){sc+=0.5;msg+="✓ Название верное\n";}else msg+="✗ Название не распознано\n";
+          if(descOk){sc+=0.5;msg+="✓ Назначение верное\n";}else msg+="✗ Назначение не распознано\n";
+          msg+="\nЭталон: "+c.full;
+          var fb=$("fb_"+c.key); fb.style.display="block";
+          if(nameOk&&descOk) fb.className="feedback ok";
+          else if(nameOk||descOk) fb.className="feedback part";
+          else fb.className="feedback bad";
+          fb.textContent=msg;
+          card2.checked=true; card2.score=sc;
           refreshCompSearch();
         });
-      })(COMP_SEARCH[i], i);
+      })(COMP_SEARCH[i],i);
     }
   }
-
   function refreshCompSearch(){
-    var done = 0, score = 0;
-    for (var k in S.stage7.cards){
-      if (S.stage7.cards.hasOwnProperty(k)){
-        if (S.stage7.cards[k].checked) done++;
-        score += S.stage7.cards[k].score || 0;
+    var done=0,score=0;
+    for(var k in S.stage7.cards){
+      if(S.stage7.cards.hasOwnProperty(k)){
+        if(S.stage7.cards[k].checked) done++;
+        score+=S.stage7.cards[k].score||0;
       }
     }
-    var rounded = Math.round(score);
-    if (rounded > 20) rounded = 20;
-    S.stage7.score = rounded;
-    $("compSearchDone").textContent = done;
-    $("compSearchScore").textContent = rounded;
-    $("btnStage7").disabled = (done < COMP_SEARCH.length);
+    var rounded=Math.round(score*100/18);
+    if(rounded>6) rounded=6;
+    S.stage7.score=rounded;
+    $("compSearchDone").textContent=done;
+    $("compSearchScore").textContent=rounded;
+    $("btnStage7").disabled=(done<COMP_SEARCH.length);
   }
-
-  $("btnStage7").addEventListener("click", function(){
-    S.stage7.status = "сдано";
-    log("Этап 7: балл " + S.stage7.score + "/20");
-    showTip("Этап 7: " + S.stage7.score + "/20", 2000);
-    refreshStageNav();
-    goToStage(8);
+  $("btnStage7").addEventListener("click",function(){
+    S.stage7.status="сдано";
+    log("Этап 10: "+S.stage7.score+"/6"); showTip("Этап 10: "+S.stage7.score+"/6",2000);
+    refreshStageNav(); goToStage(11);
   });
 
-  /* ============================================================
-     ЭТАП 8: ТЕСТ (20 вопросов)
-     ============================================================ */
-  var TEST = [
-    {q:"Что определяет тип сокета на материнской плате?", opts:["Форм-фактор корпуса","Совместимость с процессором","Тип блока питания","Объём памяти"], correct:1},
-    {q:"Какие компоненты подключаются НАПРЯМУЮ к процессору?", opts:["SATA и USB","Оперативная память и PCIe x16","M.2 и аудио","Только клавиатура"], correct:1},
-    {q:"Что такое VRM?", opts:["Видеовыход","Модуль стабилизации питания процессора","Разъём для памяти","Контроллер SATA"], correct:1},
-    {q:"Через какой разъём подаётся основное питание материнской платы?", opts:["8-pin EPS","SATA power","24-pin ATX","Molex"], correct:2},
-    {q:"Что произойдёт, если установить плату без стоек?", opts:["Ничего","Возможно короткое замыкание","Плата не влезет","Сгорит только БП"], correct:1},
-    {q:"Какой порядок затяжки винтов материнской платы правильный?", opts:["По часовой стрелке по кругу","Крест-накрест","Все сразу","Сначала центр, потом края"], correct:1},
-    {q:"Что происходит при нажатии кнопки Power?", opts:["Процессор сразу загружает ОС","Замыкается Power SW, супервизор даёт команду PS_ON","Питание подаётся только на видеокарту","Активируется только USB"], correct:1},
-    {q:"Что делает POST?", opts:["Загружает драйверы","Самотестирование при включении","Устанавливает ОС","Форматирует диск"], correct:1},
-    {q:"Что обычно подключено через чипсет?", opts:["RAM","PCIe x16","SATA, USB, часть PCIe","Только CPU"], correct:2},
-    {q:"DDR4 можно установить в слот DDR5?", opts:["Да, без проблем","Нет, ключ не совпадает","Да, но медленно","Только с переходником"], correct:1},
-    {q:"Какой сокет у процессоров AMD Ryzen 7000-й серии?", opts:["AM4","AM5","LGA1700","LGA1200"], correct:1},
-    {q:"Что такое форм-фактор материнской платы?", opts:["Стандарт размера и расположения отверстий","Тип процессора","Объём памяти","Мощность БП"], correct:0},
-    {q:"Куда подключается кабель 8-pin EPS?", opts:["На плату для питания процессора","На видеокарту","На SATA-диск","На корпусный вентилятор"], correct:0},
-    {q:"Что такое BIOS/UEFI?", opts:["Программа для программирования","Прошивка, запускающая ПК до загрузки ОС","Игра","Драйвер видеокарты"], correct:1},
-    {q:"Какие устройства подключаются через SATA?", opts:["Процессор","HDD и 2.5\" SSD","Видеокарта","Оперативная память"], correct:1},
-    {q:"Что такое M.2?", opts:["Разъём для SSD NVMe","Тип оперативной памяти","Стандарт корпуса","Тип процессора"], correct:0},
-    {q:"Можно ли установить процессор AM4 в плату с сокетом AM5?", opts:["Да","Нет, разъёмы несовместимы","Да, с переходником","Да, но медленно"], correct:1},
-    {q:"Что произойдёт, если забыть подключить 8-pin CPU?", opts:["ПК не запустится вообще","ПК включится, но не будет изображения или будет нестабилен","Сгорит видеокарта","Ничего"], correct:1},
-    {q:"Какой форм-фактор платы самый маленький?", opts:["ATX","micro-ATX","mini-ITX","E-ATX"], correct:2},
-    {q:"Что такое PCIe x16?", opts:["Слот для видеокарты и плат расширения","Разъём для памяти","Разъём питания","Разъём для вентилятора"], correct:0}
+  /* ============ ЭТАП 11: ТЕСТ ============ */
+  var TEST=[
+    {q:"Что определяет тип сокета на плате?",opts:["Форм-фактор корпуса","Совместимость с процессором","Тип БП","Объём памяти"],correct:1},
+    {q:"Какие компоненты подключаются НАПРЯМУЮ к CPU?",opts:["SATA и USB","RAM и PCIe x16","M.2 и аудио","Клавиатура"],correct:1},
+    {q:"Что такое VRM?",opts:["Видеовыход","Модуль стабилизации питания CPU","Разъём памяти","Контроллер SATA"],correct:1},
+    {q:"Через какой разъём подаётся основное питание платы?",opts:["8-pin EPS","SATA power","24-pin ATX","Molex"],correct:2},
+    {q:"Что произойдёт при установке платы без стоек?",opts:["Ничего","Возможно КЗ","Плата не влезет","Сгорит БП"],correct:1},
+    {q:"Правильный порядок затяжки винтов платы?",opts:["По кругу","Крест-накрест","Все сразу","Центр, потом края"],correct:1},
+    {q:"Что происходит при нажатии Power?",opts:["CPU грузит ОС","Power SW замыкается, чипсет даёт PS_ON","Питание только на GPU","Активируется USB"],correct:1},
+    {q:"Что делает POST?",opts:["Грузит драйверы","Самотестирование при включении","Устанавливает ОС","Форматирует диск"],correct:1},
+    {q:"Что обычно подключено через чипсет?",opts:["RAM","PCIe x16","SATA, USB, часть PCIe","Только CPU"],correct:2},
+    {q:"DDR4 можно установить в слот DDR5?",opts:["Да","Нет, ключ не совпадает","Да, медленно","С переходником"],correct:1},
+    {q:"Какой сокет у Ryzen 7000?",opts:["AM4","AM5","LGA1700","LGA1200"],correct:1},
+    {q:"Что такое форм-фактор платы?",opts:["Стандарт размера и отверстий","Тип CPU","Объём памяти","Мощность БП"],correct:0},
+    {q:"Куда подключается 8-pin EPS?",opts:["На плату для питания CPU","На GPU","На SATA-диск","На вентилятор"],correct:0},
+    {q:"Что такое BIOS/UEFI?",opts:["Программа","Прошивка, запускающая ПК","Игра","Драйвер"],correct:1},
+    {q:"Какие устройства подключаются через SATA?",opts:["CPU","HDD и 2.5\" SSD","GPU","RAM"],correct:1},
+    {q:"Что такое M.2?",opts:["Разъём для SSD NVMe","Тип RAM","Стандарт корпуса","Тип CPU"],correct:0},
+    {q:"Можно ли поставить AM4 в AM5?",opts:["Да","Нет, разъёмы несовместимы","С переходником","Да, медленно"],correct:1},
+    {q:"Что будет, если забыть 8-pin CPU?",opts:["ПК не запустится","ПК включится, но нет изображения","Сгорит GPU","Ничего"],correct:1},
+    {q:"Самый маленький форм-фактор платы?",opts:["ATX","micro-ATX","mini-ITX","E-ATX"],correct:2},
+    {q:"Что такое PCIe x16?",opts:["Слот для GPU и плат расширения","Разъём RAM","Разъём питания","Разъём вентилятора"],correct:0}
   ];
   function initStage8(){
-    var list = $("testList");
-    list.innerHTML = "";
-    for (var i=0;i<TEST.length;i++){
-      (function(t, idx){
-        var div = document.createElement("div");
-        div.className = "testQ";
-        div.innerHTML = "<div class='qtext'>" + (idx+1) + ". " + t.q + "</div>";
-        for (var j=0;j<t.opts.length;j++){
-          var lab = document.createElement("label");
-          lab.innerHTML = "<input type='radio' name='test"+idx+"' value='"+j+"'> " + t.opts[j];
+    var list=$("testList"); list.innerHTML="";
+    for(var i=0;i<TEST.length;i++){
+      (function(t,idx){
+        var div=document.createElement("div"); div.className="testQ";
+        div.innerHTML="<div class='qtext'>"+(idx+1)+". "+t.q+"</div>";
+        for(var j=0;j<t.opts.length;j++){
+          var lab=document.createElement("label");
+          lab.innerHTML="<input type='radio' name='test"+idx+"' value='"+j+"'> "+t.opts[j];
           div.appendChild(lab);
         }
         list.appendChild(div);
-      })(TEST[i], i);
+      })(TEST[i],i);
     }
   }
-  $("btnStage8").addEventListener("click", function(){
-    var correct = 0;
-    for (var i=0;i<TEST.length;i++){
-      var radios = document.getElementsByName("test"+i);
-      for (var j=0;j<radios.length;j++){
-        if (radios[j].checked && parseInt(radios[j].value,10) === TEST[i].correct) correct++;
-      }
+  $("btnStage8").addEventListener("click",function(){
+    var correct=0;
+    for(var i=0;i<TEST.length;i++){
+      var radios=document.getElementsByName("test"+i);
+      for(var j=0;j<radios.length;j++) if(radios[j].checked&&parseInt(radios[j].value,10)===TEST[i].correct) correct++;
     }
-    S.stage8.score = Math.round(correct / TEST.length * 10);
-    S.stage8.status = "сдано";
-    log("Этап 8: " + correct + "/" + TEST.length + " — " + S.stage8.score + "/10");
-    showTip("Тест: " + S.stage8.score + "/10", 2000);
-    refreshStageNav();
-    goToStage(9);
-    finish(false);
+    S.stage8.score=Math.round(correct/TEST.length*6); S.stage8.status="сдано";
+    log("Этап 11: "+correct+"/"+TEST.length+" = "+S.stage8.score+"/6");
+    showTip("Тест: "+S.stage8.score+"/6",2000);
+    refreshStageNav(); goToStage(12); finish();
   });
 
-  /* ============================================================
-     СДАТЬ / ФИНАЛ
-     ============================================================ */
-  $("btnSubmit").addEventListener("click", function(){
-    if (confirm("Сдать работу? Незавершённые этапы получат 0 баллов.")) finish(false);
+  /* ============ ФИНАЛ ============ */
+  $("btnSubmit").addEventListener("click",function(){
+    if(confirm("Сдать работу?")) finish();
   });
-
-  function finish(timeout){
-    try {
-      var timeSpent = Math.floor((Date.now() - S.startTime) / 1000);
-      var keys  = ["stage1","stage2","stage3","stage4","stage5","stage6","stage7","stage8"];
-      var names = ["1. Сопоставление","2. Совместимость","3. Монтаж 3D","4. Маршруты","5. Сигнал","6. Диагностика","7. Поиск и описание","8. Тест"];
-      var maxes = { stage1:8, stage2:15, stage3:15, stage4:10, stage5:12, stage6:10, stage7:20, stage8:10 };
-      var total = 0;
-      var rows = [];
-      for (var i=0;i<keys.length;i++){
-        var key = keys[i];
-        var sc = (S[key] && S[key].score) || 0;
-        total += sc;
-        rows.push([names[i], sc, maxes[key], (S[key] && S[key].status) || "не сдано"]);
+  function finish(){
+    try{
+      var keys=["stage1","stage2","stage3id","stage4c","stage3","stage3b","stage4b","stage4","stage6","stage7","stage8"];
+      var names=["1. Сопоставление","2. Совместимость","3. Разъёмы","4. Кабели БП","5. Монтаж 3D","6. Подключение","7. Сигналы","8. Маршруты","9. Диагностика","10. Поиск","11. Тест"];
+      var maxes={stage1:6,stage2:8,stage3id:6,stage4c:6,stage3:10,stage3b:15,stage4b:20,stage4:6,stage6:11,stage7:6,stage8:6};
+      var total=0, rows=[];
+      for(var i=0;i<keys.length;i++){
+        var key=keys[i]; var sc=(S[key]&&S[key].score)||0; total+=sc;
+        rows.push([names[i],sc,maxes[key],(S[key]&&S[key].status)||"не сдано"]);
       }
-      if (total > 100) total = 100;
-
-      var grade = "неудовлетворительно";
-      if (total >= 90) grade = "отлично";
-      else if (total >= 75) grade = "хорошо";
-      else if (total >= 60) grade = "удовлетворительно";
-
-      $("grade").textContent = total + " / 100 — " + grade;
-      $("grade").className = total >= 75 ? "ok" : (total >= 60 ? "warn" : "bad");
-      $("summary").innerHTML = "<b>" + S.fio + "</b>, группа <b>" + S.group + "</b>.<br>" +
-        "Время: <b>" + Math.floor(timeSpent/60) + " мин " + (timeSpent%60) + " с</b>." +
-        (timeout ? " <span class='bad'>(время истекло)</span>" : "");
-
-      var tb = $("scoreTable").getElementsByTagName("tbody")[0];
-      tb.innerHTML = "";
-      for (var r=0;r<rows.length;r++){
-        var tr = document.createElement("tr");
-        var cls = rows[r][1] >= rows[r][2] ? "ok" : (rows[r][1] > 0 ? "warn" : "bad");
-        tr.innerHTML = "<td>" + rows[r][0] + "</td><td class='" + cls + "'>" + rows[r][1] + "</td><td>" + rows[r][2] + "</td><td>" + rows[r][3] + "</td>";
+      if(total>100) total=100;
+      var grade="неудовлетворительно";
+      if(total>=90) grade="отлично";
+      else if(total>=75) grade="хорошо";
+      else if(total>=60) grade="удовлетворительно";
+      $("grade").textContent=total+" / 100 — "+grade;
+      $("grade").className=total>=75?"ok":(total>=60?"warn":"bad");
+      $("summary").innerHTML="<b>"+S.fio+"</b>, группа <b>"+S.group+"</b>.";
+      var tb=$("scoreTable").getElementsByTagName("tbody")[0]; tb.innerHTML="";
+      for(var r=0;r<rows.length;r++){
+        var tr=document.createElement("tr");
+        var cls=rows[r][1]>=rows[r][2]?"ok":(rows[r][1]>0?"warn":"bad");
+        tr.innerHTML="<td>"+rows[r][0]+"</td><td class='"+cls+"'>"+rows[r][1]+"</td><td>"+rows[r][2]+"</td><td>"+rows[r][3]+"</td>";
         tb.appendChild(tr);
       }
-      var trT = document.createElement("tr");
-      trT.innerHTML = "<td><b>ИТОГО</b></td><td><b>" + total + "</b></td><td><b>100</b></td><td></td>";
+      var trT=document.createElement("tr");
+      trT.innerHTML="<td><b>ИТОГО</b></td><td><b>"+total+"</b></td><td><b>100</b></td><td></td>";
       tb.appendChild(trT);
-
-      var imgs = $("resultImages");
-      imgs.innerHTML = "";
-      for (var k in S.stage7.cards){
-        if (S.stage7.cards.hasOwnProperty(k)){
-          var c = S.stage7.cards[k];
-          var wrap = document.createElement("div");
-          wrap.style.cssText = "width:160px; background:#1a2331; border-radius:8px; padding:8px; text-align:center; font-size:11px;";
-          if (c.imgUrl){
-            wrap.innerHTML = "<img src='" + c.imgUrl + "' style='width:100%; height:100px; object-fit:cover; border-radius:6px;'><br>" + k;
-          } else {
-            wrap.innerHTML = "<div style='height:100px; display:flex; align-items:center; justify-content:center; color:#55637a;'>нет изображения</div><br>" + k;
-          }
+      var imgs=$("resultImages"); imgs.innerHTML="";
+      for(var k in S.stage7.cards){
+        if(S.stage7.cards.hasOwnProperty(k)){
+          var c=S.stage7.cards[k];
+          var wrap=document.createElement("div");
+          wrap.style.cssText="width:160px;background:#1a2331;border-radius:8px;padding:8px;text-align:center;font-size:11px;";
+          if(c.imgUrl) wrap.innerHTML="<img src='"+c.imgUrl+"' style='width:100%;height:100px;object-fit:cover;border-radius:6px'><br>"+k;
+          else wrap.innerHTML="<div style='height:100px;display:flex;align-items:center;justify-content:center;color:#55637a'>нет изображения</div><br>"+k;
           imgs.appendChild(wrap);
         }
       }
-
-      var all = ["stage0","stage1","stage2","stage3","stage4","stage5","stage6","stage7","stage8"];
-      for (var c2=0;c2<all.length;c2++) $(all[c2]).style.display = "none";
-      $("result").style.display = "block";
-      S.currentStage = 9;
-      $("pillStep").textContent = "Этап: 10/10";
-      $("stepTitle").textContent = "Результат";
+      var all=["stage0","stage1","stage2","stage3id","stage4c","stage3","stage3b","stage4b","stage4","stage6","stage7","stage8"];
+      for(var c2=0;c2<all.length;c2++) $(all[c2]).style.display="none";
+      $("result").style.display="block";
+      S.currentStage=12;
+      $("pillStep").textContent="Этап: 13/13";
+      $("stepTitle").textContent="Результат";
       refreshStageNav();
-      log("ФИНАЛ. Итог " + total + "/100, оценка " + grade);
+      log("ФИНАЛ: "+total+"/100, "+grade);
       renderLog();
-    } catch(err){ showError(err.message); }
+    }catch(e){ showError(e.message); }
   }
-
-  $("btnPrint").addEventListener("click", function(){ window.print(); });
-
+  $("btnPrint").addEventListener("click",function(){ window.print(); });
 })();
-</script>
 </script>
 </body>
 </html>
